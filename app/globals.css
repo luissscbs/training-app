@@ -1,26 +1,45 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* Design system: Kinetic Dark Athletic (Stitch: Workout Routine & Schedule Tracker) */
+@theme {
+  --color-surface: #0b1326;
+  --color-slowest: #060e20;
+  --color-slow: #131b2e;
+  --color-scont: #171f33;
+  --color-shigh: #222a3d;
+  --color-shighest: #2d3449;
+  --color-sbright: #31394d;
+  --color-onsurface: #dae2fd;
+  --color-onvariant: #c1cab0;
+  --color-primary: #9ee939;
+  --color-pcont: #84cc16;
+  --color-onpcont: #315200;
+  --color-onprimary: #1f3700;
+  --color-secondary: #4cd7f6;
+  --color-seccont: #03b5d3;
+  --color-tertiary: #5fedb0;
+  --color-tercont: #3cd096;
+  --color-error: #ffb4ab;
+  --color-outline: #8b947d;
+  --color-outlinevar: #424936;
+
+  --font-sans: var(--font-jakarta), "Plus Jakarta Sans", system-ui, sans-serif;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  html {
+    color-scheme: dark;
+  }
+  body {
+    background: var(--color-surface);
+    color: var(--color-onsurface);
+    font-family: var(--font-sans);
+  }
+  ::-webkit-scrollbar {
+    display: none;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@utility tabular {
+  font-variant-numeric: tabular-nums;
 }

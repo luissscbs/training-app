@@ -11,11 +11,20 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 # Training App — agent notes
 
 Fresh `create-next-app` scaffold (Next 16.3.4 + React 19 + TS5 + Tailwind 4).
-`README.md` describes the target (Auth.js v5 Google login, Neon + Drizzle,
-routines Mon–Sun, weight log, dashboard, Vercel deploy) but **none of it is
-implemented yet**: no auth/DB deps in `package.json`, no `drizzle/`, no
-`.env.example`, no `db:migrate`/`db:seed` scripts. Trust `package.json` over
-`README.md` until those land.
+DB base lista (2026-09-11): Drizzle + Neon (proyecto `blue-dream-00362098`,
+branch `production`), 7 tablas (`users`, `routines`, `exercises`, `sessions`,
+`set_logs`, `body_weights`, `schedule`), migraciones en `drizzle/`, seed de 7
+rutinas Lun–Dom aplicado. `README.md` describe el target completo; hecho Auth.js
+v5 Google login (JWT + sync a `users` en `auth.ts`, ruta
+`app/api/auth/[...nextauth]`), front Stitch "Kinetic Dark Athletic"
+(sidebar/topbar/nav móvil + Dashboard `/`, calendario `/semana`, registro con
+fecha en `/rutina/[weekday]` y `/rutinas/[id]`, `/rutinas` con builder + plan
+semanal, `/progreso`, `/perfil` con peso/altura/IMC), actions en
+`app/actions.ts`, catálogo de imágenes en `lib/exerciseMedia.ts`
+(free-exercise-db). `AUTH_SECRET` en `.env.local`, faltan
+`GOOGLE_CLIENT_ID/SECRET` del usuario).
+Pendiente: deploy Vercel.
+Trust `package.json` over `README.md` hasta que aterricen.
 
 ## Commands (verified in `package.json`)
 
