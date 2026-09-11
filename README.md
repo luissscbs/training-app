@@ -1,36 +1,39 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Training App 🏋️
 
-## Getting Started
+App web para registrar entrenamientos: rutinas predefinidas por día de la semana, calendario de sesiones, registro de pesos y unidades configurables (kg/lb). Con dashboard de progreso e inicio de sesión con Google.
 
-First, run the development server:
+> Proyecto en construcción (MVP).
+
+## Stack
+
+- **Next.js 16** (App Router) + **TypeScript** + **Tailwind CSS 4**
+- **Auth.js v5** — login con Google
+- **Neon Postgres + Drizzle** — base de datos serverless y ORM
+- **Vercel** — deploy continuo desde `main`
+
+## Desarrollo local
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+cp .env.example .env.local   # completar DATABASE_URL, GOOGLE_CLIENT_ID/SECRET, AUTH_SECRET
+npm run db:migrate           # aplicar migraciones
+npm run db:seed              # rutinas Lun–Dom predefinidas
+npm run dev                  # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Scripts
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| Comando           | Qué hace                              |
+| ----------------- | ------------------------------------- |
+| `npm run dev`     | servidor de desarrollo                |
+| `npm run build`   | build de producción (lo que usa Vercel)|
+| `npm run start`   | sirve el build de producción          |
+| `npm run lint`    | ESLint                                |
+| `npm run db:migrate` | aplica migraciones Drizzle         |
+| `npm run db:seed` | carga las 7 rutinas predefinidas      |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Decisiones clave
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Las rutinas son **plantillas fijas** (ejercicios, series, reps); el usuario solo edita **pesos y horarios** de sus sesiones.
+- Los pesos se guardan en **kg** (unidad canónica) y la UI convierte a lb según la preferencia del usuario.
+- `.env.local` nunca se commitea; en Vercel las vars se configuran en el dashboard del proyecto.
