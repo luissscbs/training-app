@@ -9,6 +9,7 @@ import { formatWeight } from "@/lib/units";
 import { getWeekPlan } from "@/lib/schedule";
 import { dateWeekday, shiftDateStr } from "@/lib/dates";
 import { getRequestToday } from "@/lib/requestDate";
+import { isAdminEmail } from "@/lib/admin";
 
 const DAYS = [
   "Lunes",
@@ -291,6 +292,25 @@ export default async function Home() {
                   </span>
                   <span className="text-xs text-onvariant">
                     Sesión de hoy en tu rutina propia. Toca para continuar ahí.
+                  </span>
+                </span>
+              </span>
+              <Icon name="chevron_right" className="text-[20px] text-primary" />
+            </Link>
+          )}
+          {isAdminEmail(session?.user?.email) && (
+            <Link
+              href="/admin"
+              className="relative z-10 flex items-center justify-between gap-3 rounded-xl border border-white/10 bg-slow p-4"
+            >
+              <span className="flex items-center gap-3">
+                <Icon name="shield" className="text-[24px] text-primary" />
+                <span className="flex flex-col">
+                  <span className="text-sm font-bold">
+                    Panel admin · quién se registra
+                  </span>
+                  <span className="text-xs text-onvariant">
+                    Altas, actividad y sesiones de tus atletas.
                   </span>
                 </span>
               </span>

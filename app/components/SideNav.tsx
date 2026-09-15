@@ -1,8 +1,12 @@
 import Link from "next/link";
+import { auth } from "@/auth";
 import { Icon } from "@/app/components/Icon";
 import { SideNavLinks } from "@/app/components/NavLinks";
+import { isAdminEmail } from "@/lib/admin";
 
-export function SideNav() {
+export async function SideNav() {
+  const session = await auth();
+  const showAdmin = isAdminEmail(session?.user?.email);
   return (
     <aside className="fixed inset-y-0 left-0 z-50 hidden w-72 flex-col justify-between bg-slowest p-6 lg:flex">
       <div className="flex flex-col gap-8">
@@ -24,6 +28,15 @@ export function SideNav() {
           </div>
         </Link>
         <SideNavLinks />
+        {showAdmin && (
+          <Link
+            href="/admin"
+            className="flex items-center gap-3 rounded-lg px-4 py-2 text-sm text-onvariant transition-all duration-150 hover:bg-shigh hover:text-onsurface"
+          >
+            <Icon name="shield" className="text-[20px]" />
+            <span className="text-sm font-semibold">Admin</span>
+          </Link>
+        )}
       </div>
       <div className="flex flex-col gap-2 rounded-xl bg-slow p-4">
         <div className="flex items-center justify-between">
