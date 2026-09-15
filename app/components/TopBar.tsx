@@ -57,10 +57,14 @@ export async function TopBar() {
   return (
     <header className="fixed inset-x-0 top-0 z-40 flex h-16 items-center justify-between bg-surface/80 px-4 backdrop-blur-xl sm:px-6 lg:left-72 lg:px-8">
       <div className="flex items-center gap-2">
-        <span className="flex items-center gap-1.5 rounded-full bg-slow px-3 py-1.5 lg:hidden">
+        <Link
+          href="/"
+          aria-label="Ir al inicio"
+          className="flex items-center gap-1.5 rounded-full bg-slow px-3 py-1.5 transition-opacity hover:opacity-80 lg:hidden"
+        >
           <Icon name="fitness_center" className="text-[16px] text-primary" />
           <span className="text-sm font-extrabold tracking-tight">KINETIX</span>
-        </span>
+        </Link>
         <span className="hidden items-center gap-1.5 rounded-full bg-slow px-4 py-1.5 sm:flex">
           <Icon name="calendar_today" className="text-[16px] text-primary" />
           <span className="text-xs font-semibold">{dateLabel}</span>

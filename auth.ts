@@ -1,5 +1,6 @@
 import NextAuth from "next-auth";
 import Google from "next-auth/providers/google";
+import { eq } from "drizzle-orm";
 import { db } from "@/db";
 import { users } from "@/db/schema";
 
@@ -37,11 +38,57 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       return true;
     },
     async jwt({ token, user }) {
-      if (user?.id) token.sub = user.id;
+      if (user?.id) {
+        // La sesión debe apuntar a la fila real en users. Si ya existe una
+        // fila con este email (creada antes o con otra identidad), se adopta
+        // su id; si no, el insert del signIn ya creó la fila con user.id.
+        // Sin esto, lecturas y escrituras van a un id huérfano: los UPDATE
+        // tocan 0 filas en silencio y el IMC / la unidad nunca se muestran.
+        try {
+          if (user.email) {
+            const existing = await db.query.users.findFirst({
+              where: eq(users.email, user.email),
+              columns: { id: true },
+            });
+            token.sub = existing?.id ?? user.id;
+          } else {
+            token.sub = user.id;
+          }
+        } catch (err) {
+          console.error("jwt: no se pudo resolver la identidad", err);
+          token.sub = user.id;
+        }
+      }
       return token;
     },
     async session({ session, token }) {
-      if (session.user && token.sub) session.user.id = token.sub;
+      if (session.user && token.sub) {
+        let id = token.sub;
+        try {
+          // Repara cookies ya emitidas con una sub huérfana (sin fila en
+          // users): adopta la fila del mismo email para que la app lea y
+          // escriba donde toca desde la primera carga, sin re-login.
+          const byId = await db.query.users.findFirst({
+            where: eq(users.id, token.sub),
+            columns: { id: true },
+          });
+          if (!byId) {
+            const email =
+              session.user.email ??
+              (typeof token.email === "string" ? token.email : undefined);
+            if (email) {
+              const byEmail = await db.query.users.findFirst({
+                where: eq(users.email, email),
+                columns: { id: true },
+              });
+              if (byEmail) id = byEmail.id;
+            }
+          }
+        } catch (err) {
+          console.error("session: no se pudo resolver la identidad", err);
+        }
+        session.user.id = id;
+      }
       return session;
     },
   },

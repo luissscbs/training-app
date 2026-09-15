@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { logBodyWeight, updateProfile } from "@/app/actions";
 import { Icon } from "@/app/components/Icon";
 
@@ -17,6 +18,7 @@ export function ProfileForm({
   const [height, setHeight] = useState(initialHeightCm);
   const [msg, setMsg] = useState<string | null>(null);
   const [pending, start] = useTransition();
+  const router = useRouter();
 
   function onSave() {
     setMsg(null);
@@ -31,6 +33,9 @@ export function ProfileForm({
           throw new Error("Altura inválida");
         }
         await updateProfile({ weight: w, unit, heightCm: h });
+        // Refresca los Server Components (tarjetas IMC / Peso actual)
+        // para que muestren los valores recién guardados sin recarga manual.
+        router.refresh();
         setMsg("Perfil guardado.");
       } catch (err) {
         setMsg(err instanceof Error ? err.message : "No se pudo guardar");
@@ -89,6 +94,7 @@ export function WeightLogForm({ unit, today }: { unit: "kg" | "lb"; today: strin
   const [weight, setWeight] = useState("");
   const [msg, setMsg] = useState<string | null>(null);
   const [pending, start] = useTransition();
+  const router = useRouter();
 
   function onLog() {
     setMsg(null);
@@ -98,6 +104,7 @@ export function WeightLogForm({ unit, today }: { unit: "kg" | "lb"; today: strin
         if (!Number.isFinite(w) || w <= 0) throw new Error("Peso inválido");
         await logBodyWeight(date, w, unit);
         setWeight("");
+        router.refresh();
         setMsg(`Registrado ${w} ${unit} el ${date}.`);
       } catch (err) {
         setMsg(err instanceof Error ? err.message : "No se pudo registrar");

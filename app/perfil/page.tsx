@@ -97,6 +97,7 @@ export default async function PerfilPage() {
             </h2>
             <div className="mt-3">
               <ProfileForm
+                key={unit}
                 unit={unit}
                 initialWeight={displayWeight}
                 initialHeightCm={heightCm !== null ? String(heightCm) : ""}
@@ -145,7 +146,7 @@ export default async function PerfilPage() {
               Peso corporal
             </h2>
             <div className="mt-3">
-              <WeightLogForm unit={unit} today={toStr(new Date())} />
+              <WeightLogForm key={unit} unit={unit} today={toStr(new Date())} />
             </div>
             {points.length > 1 ? (
               <div className="mt-4 rounded-xl bg-scont p-3">

@@ -27,7 +27,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           rel="stylesheet"
         />
       </head>
-      <body className="min-h-full font-sans antialiased">
+      <body suppressHydrationWarning className="min-h-full font-sans antialiased">
         <SideNav />
         <div className="lg:pl-72">
           <TopBar />

@@ -7,8 +7,25 @@ import { sessions, setLogs, users } from "@/db/schema";
 import { Icon } from "@/app/components/Icon";
 import { WeekDayCard, type DayCardData } from "@/app/components/WeekDayCard";
 import { getWeekPlan } from "@/lib/schedule";
+import { formatWeight } from "@/lib/units";
 
 const DAY_ABBR = ["LUN", "MAR", "MIÉ", "JUE", "VIE", "SÁB", "DOM"];
+const DAY_NAMES = [
+  "Lunes",
+  "Martes",
+  "Miércoles",
+  "Jueves",
+  "Viernes",
+  "Sábado",
+  "Domingo",
+];
+
+function bmiCategory(bmi: number): { label: string; cls: string } {
+  if (bmi < 18.5) return { label: "Bajo peso", cls: "text-secondary" };
+  if (bmi < 25) return { label: "Saludable", cls: "text-tertiary" };
+  if (bmi < 30) return { label: "Sobrepeso", cls: "text-primary" };
+  return { label: "Obesidad", cls: "text-error" };
+}
 
 function toStr(d: Date): string {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
@@ -20,10 +37,15 @@ export default async function SemanaPage() {
   const userId = session.user.id;
 
   const userRows = await db
-    .select({ unit: users.unit })
+    .select({ unit: users.unit, weightKg: users.weightKg, heightCm: users.heightCm })
     .from(users)
     .where(eq(users.id, userId));
   const unit: "kg" | "lb" = userRows[0]?.unit === "lb" ? "lb" : "kg";
+  const weightKg = userRows[0]?.weightKg ? Number(userRows[0].weightKg) : null;
+  const heightCm = userRows[0]?.heightCm ? Number(userRows[0].heightCm) : null;
+  const bmi =
+    weightKg && heightCm ? weightKg / Math.pow(heightCm / 100, 2) : null;
+  const bmiCat = bmi !== null ? bmiCategory(bmi) : null;
 
   const now = new Date();
   const todayWeekday = (now.getDay() + 6) % 7;
@@ -89,6 +111,17 @@ export default async function SemanaPage() {
     const topKg = sess
       ? sess.setLogs.reduce((m, l) => Math.max(m, Number(l.weightKg)), 0)
       : 0;
+    // Series registradas por ejercicio (programado vs hecho en el desplegable).
+    const loggedByExercise: Record<number, { count: number; topKg: number }> =
+      {};
+    if (sess) {
+      for (const l of sess.setLogs) {
+        const cur = loggedByExercise[l.exerciseId] ?? { count: 0, topKg: 0 };
+        cur.count += 1;
+        cur.topKg = Math.max(cur.topKg, Number(l.weightKg));
+        loggedByExercise[l.exerciseId] = cur;
+      }
+    }
     return {
       kind: "day",
       day: {
@@ -110,6 +143,7 @@ export default async function SemanaPage() {
         setsCount: sess?.setLogs.length ?? 0,
         topKg,
         unit,
+        loggedByExercise,
         exercises: r.exercises.map((e) => ({
           id: e.id,
           name: e.name,
@@ -129,6 +163,15 @@ export default async function SemanaPage() {
   const trainDays = plan.configured
     ? plan.days.filter((d) => d.routine !== null).length
     : 7;
+  const weekVolumeKg = items.reduce(
+    (a, it) => a + (it.kind === "day" ? it.day.volumeKg : 0),
+    0,
+  );
+  const todayItem = items.find((it) =>
+    it.kind === "day"
+      ? it.day.weekday === todayWeekday
+      : it.weekday === todayWeekday,
+  );
 
   return (
     <main className="relative mx-auto flex w-full max-w-3xl flex-col gap-5 pb-8">
@@ -157,6 +200,80 @@ export default async function SemanaPage() {
           </span>
         </div>
       </div>
+
+      {/* ---- Hoy toca ---- */}
+      {todayItem ? (
+        todayItem.kind === "day" ? (
+          <section className="relative z-10 flex flex-col gap-3 rounded-xl bg-scont p-4 shadow-lg sm:flex-row sm:items-center sm:justify-between sm:p-5">
+            <div className="flex min-w-0 flex-col">
+              <span className="text-[10px] font-bold uppercase tracking-widest text-primary">
+                Hoy · {DAY_NAMES[todayWeekday]}
+                {todayItem.day.custom ? " · mi rutina" : ""}
+              </span>
+              <h2 className="truncate text-xl font-bold">
+                {todayItem.day.title}
+              </h2>
+              {todayItem.day.focus && (
+                <p className="truncate text-sm text-onvariant">
+                  {todayItem.day.focus}
+                </p>
+              )}
+              <span className="tabular mt-1 text-xs font-bold">
+                {todayItem.day.completed ? (
+                  <span className="text-tertiary">
+                    ✓ Hecha
+                    {todayItem.day.volumeKg > 0 &&
+                      ` · ${formatWeight(todayItem.day.volumeKg, unit)}`}
+                  </span>
+                ) : todayItem.day.hasSession ? (
+                  <span className="text-onvariant">
+                    {formatWeight(todayItem.day.volumeKg, unit)} · en curso
+                  </span>
+                ) : (
+                  <span className="text-onvariant">Pendiente</span>
+                )}
+              </span>
+            </div>
+            <div className="flex shrink-0 gap-2">
+              {todayItem.day.loggable && !todayItem.day.completed && (
+                <Link
+                  href={todayItem.day.registerHref}
+                  className="flex items-center justify-center gap-1.5 rounded-xl bg-pcont px-5 py-2.5 text-sm font-extrabold text-onpcont transition-all hover:scale-[1.01]"
+                >
+                  <Icon name="edit" className="text-[18px]" />
+                  Registrar hoy
+                </Link>
+              )}
+              <Link
+                href={todayItem.day.detailHref}
+                className="flex items-center justify-center gap-1.5 rounded-xl bg-shigh px-4 py-2.5 text-sm font-bold hover:bg-sbright"
+              >
+                <Icon name="visibility" className="text-[18px]" />
+                Ver ejercicios
+              </Link>
+            </div>
+          </section>
+        ) : (
+          <section className="relative z-10 flex flex-col gap-3 rounded-xl bg-scont p-4 shadow-lg sm:flex-row sm:items-center sm:justify-between sm:p-5">
+            <div className="flex flex-col">
+              <span className="text-[10px] font-bold uppercase tracking-widest text-secondary">
+                Hoy · {DAY_NAMES[todayWeekday]} · descanso
+              </span>
+              <h2 className="text-xl font-bold">Recupera y vuelve fuerte</h2>
+              <p className="text-sm text-onvariant">
+                Día libre según tu plan.
+              </p>
+            </div>
+            <Link
+              href="/rutinas#mi-semana"
+              className="flex shrink-0 items-center justify-center gap-1.5 rounded-xl bg-shigh px-4 py-2.5 text-sm font-bold hover:bg-sbright"
+            >
+              <Icon name="edit_calendar" className="text-[18px]" />
+              Cambiar plan
+            </Link>
+          </section>
+        )
+      ) : null}
 
       <div className="relative z-10 flex flex-col gap-2.5">
         {items.map((it) =>
@@ -194,6 +311,63 @@ export default async function SemanaPage() {
           ),
         )}
       </div>
+
+      {/* ---- Mi estado: peso, IMC y volumen de la semana ---- */}
+      <section className="relative z-10 rounded-xl bg-slow p-4 shadow-md sm:p-5">
+        <h2 className="flex items-center gap-2 text-base font-bold">
+          <Icon name="favorite" className="text-[20px] text-tertiary" />
+          Mi estado
+        </h2>
+        <div className="mt-3 grid grid-cols-3 gap-2 sm:gap-3">
+          <div className="flex flex-col rounded-xl bg-scont p-3">
+            <span className="text-[10px] font-semibold uppercase tracking-wider text-onvariant">
+              Peso
+            </span>
+            <span className="tabular mt-1 text-xl font-extrabold sm:text-2xl">
+              {weightKg !== null
+                ? formatWeight(weightKg, unit).split(" ")[0]
+                : "—"}
+              {weightKg !== null && (
+                <span className="ml-1 text-xs font-bold text-primary">
+                  {unit}
+                </span>
+              )}
+            </span>
+          </div>
+          <div className="flex flex-col rounded-xl bg-scont p-3">
+            <span className="text-[10px] font-semibold uppercase tracking-wider text-onvariant">
+              IMC
+            </span>
+            <span className="tabular mt-1 text-xl font-extrabold sm:text-2xl">
+              {bmi !== null ? bmi.toFixed(1) : "—"}
+            </span>
+            {bmiCat ? (
+              <span className={`text-[11px] font-bold ${bmiCat.cls}`}>
+                {bmiCat.label}
+              </span>
+            ) : (
+              <Link
+                href="/perfil"
+                className="text-[11px] font-bold text-secondary underline underline-offset-2"
+              >
+                Completa tu perfil
+              </Link>
+            )}
+          </div>
+          <div className="flex flex-col rounded-xl bg-scont p-3">
+            <span className="text-[10px] font-semibold uppercase tracking-wider text-onvariant">
+              Volumen sem.
+            </span>
+            <span className="tabular mt-1 text-xl font-extrabold sm:text-2xl">
+              {formatWeight(weekVolumeKg, unit).split(" ")[0]}
+              <span className="ml-1 text-xs font-bold text-primary">{unit}</span>
+            </span>
+            <span className="tabular text-[11px] text-onvariant">
+              {doneCount}/{trainDays} sesiones
+            </span>
+          </div>
+        </div>
+      </section>
 
       {!plan.configured && (
         <Link

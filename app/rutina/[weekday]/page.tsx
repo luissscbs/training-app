@@ -195,7 +195,7 @@ export default async function RutinaPage({
       <div className="relative z-10 grid grid-cols-1 items-start gap-5 lg:grid-cols-12">
         <div className="lg:col-span-8">
           <SessionTracker
-            key={`${routine.id}-${date}`}
+            key={`${routine.id}-${date}-${unit}`}
             routineId={routine.id}
             routineTitle={routine.title}
             routineDate={date}

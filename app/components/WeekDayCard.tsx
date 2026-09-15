@@ -33,15 +33,25 @@ export type DayCardData = {
   topKg: number;
   unit: "kg" | "lb";
   exercises: DayExercise[];
+  /** Por ejercicio: series registradas y top en kg (sesión de esa fecha). */
+  loggedByExercise: Record<number, { count: number; topKg: number }>;
 };
 
 export function WeekDayCard({ day }: { day: DayCardData }) {
   const [open, setOpen] = useState(day.isToday);
   const { unit } = day;
 
-  const metric = day.hasSession
-    ? `${formatWeight(day.volumeKg, unit)} · ${day.setsCount} series${day.topKg > 0 ? ` · top ${formatWeight(day.topKg, unit)}` : ""}`
-    : `${day.exercises.length} ejercicios · programado`;
+  // Fila compacta: solo el resultado (o el estado), sin conteos.
+  const metric =
+    day.completed && !day.hasSession
+      ? "Hecha"
+      : day.hasSession
+        ? day.topKg > 0
+          ? `${formatWeight(day.volumeKg, unit)} · top ${formatWeight(day.topKg, unit)}`
+          : formatWeight(day.volumeKg, unit)
+        : day.loggable
+          ? "Sin registrar"
+          : "Programado";
 
   return (
     <div
@@ -106,26 +116,59 @@ export function WeekDayCard({ day }: { day: DayCardData }) {
             <p className="text-xs text-onvariant">{day.focus}</p>
           )}
           <ul className="flex flex-col gap-1.5">
-            {day.exercises.map((e) => (
-              <li
-                key={e.id}
-                className="flex items-center gap-2.5 rounded-lg bg-shigh/60 p-2"
-              >
-                <ExerciseThumb name={e.name} className="h-11 w-11" />
-                <span className="flex min-w-0 flex-1 flex-col">
-                  <span className="truncate text-xs font-bold leading-snug">
-                    {e.name}
+            {day.exercises.map((e) => {
+              const log = day.loggedByExercise[e.id];
+              const count = log?.count ?? 0;
+              const done = count >= e.sets;
+              const partial = !done && count > 0;
+              return (
+                <li
+                  key={e.id}
+                  className="flex items-center gap-2.5 rounded-lg bg-shigh/60 p-2"
+                >
+                  <ExerciseThumb name={e.name} className="h-11 w-11" />
+                  <span className="flex min-w-0 flex-1 flex-col">
+                    <span className="truncate text-xs font-bold leading-snug">
+                      {e.name}
+                    </span>
+                    <span className="tabular text-[11px] text-onvariant">
+                      Prog. {e.sets} × {e.reps}
+                      {e.muscle ? ` · ${e.muscle}` : ""}
+                    </span>
                   </span>
-                  <span className="tabular text-[11px] text-onvariant">
-                    {e.sets} × {e.reps}
-                    {e.muscle ? ` · ${e.muscle}` : ""}
+                  <span className="flex shrink-0 flex-col items-end">
+                    <span
+                      className={`tabular inline-flex items-center gap-1 text-xs font-bold ${
+                        done
+                          ? "text-primary"
+                          : partial
+                            ? "text-secondary"
+                            : "text-onvariant"
+                      }`}
+                    >
+                      <Icon
+                        name={
+                          done
+                            ? "check_circle"
+                            : partial
+                              ? "hourglass_top"
+                              : "radio_button_unchecked"
+                        }
+                        className="text-[14px]"
+                      />
+                      {count}/{e.sets}
+                    </span>
+                    <span className="tabular text-[11px] text-onvariant">
+                      {log && log.topKg > 0
+                        ? `top ${formatWeight(log.topKg, unit)}`
+                        : e.lastKg !== null
+                          ? `últ. ${formatWeight(e.lastKg, unit)}`
+                          : "—"}
+                    </span>
                   </span>
-                </span>
-                <span className="tabular shrink-0 text-xs font-bold text-primary">
-                  {e.lastKg !== null ? formatWeight(e.lastKg, unit) : "—"}
-                </span>
-              </li>
-            ))}
+                </li>
+              );
+            })}
           </ul>
           <div className="mt-1 flex gap-2">
             {day.loggable && !day.completed && (

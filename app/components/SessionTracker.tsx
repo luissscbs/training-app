@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useTransition } from "react";
+import { useMemo, useRef, useState, useTransition } from "react";
 import { saveSetLogs, startSession, type SetInput } from "@/app/actions";
 import { ExerciseThumb } from "@/app/components/ExerciseThumb";
 import { Icon } from "@/app/components/Icon";
@@ -25,6 +25,12 @@ function toDisplay(weightKg: number, unit: "kg" | "lb"): string {
   const v = unit === "kg" ? weightKg : kgToLb(weightKg);
   const r = Math.round(v * 10) / 10;
   return Number.isFinite(r) ? String(r) : "";
+}
+
+/** Reps por defecto desde la plantilla ("8-12" → "8", "10" → "10"). */
+function defaultReps(template: string): string {
+  const m = template.match(/\d+/);
+  return m ? m[0] : "";
 }
 
 export function SessionTracker({
@@ -57,6 +63,8 @@ export function SessionTracker({
   const [notes, setNotes] = useState(initialNotes);
   const [pending, start] = useTransition();
   const [msg, setMsg] = useState<string | null>(null);
+  const fieldRefs = useRef(new Map<string, HTMLInputElement>());
+  const [busyKey, setBusyKey] = useState<string | null>(null);
 
   const [rowCounts, setRowCounts] = useState<Record<number, number>>(() => {
     const counts: Record<number, number> = {};
@@ -134,6 +142,61 @@ export function SessionTracker({
     });
   };
 
+  function fieldRef(key: string) {
+    return (el: HTMLInputElement | null) => {
+      if (el) fieldRefs.current.set(key, el);
+      else fieldRefs.current.delete(key);
+    };
+  }
+
+  // Tocar el estado (○/✓) completa la serie y la envía a la BD al momento:
+  // rellena peso/reps por defecto, guarda todo lo rellenado y lo confirma
+  // con un mensaje ("Serie enviada"). Si falta un valor sin defecto,
+  // lleva el cursor a ese campo en vez de guardar.
+  function quickComplete(exId: number, setNo: number) {
+    const key = `${exId}:${setNo}`;
+    const cur = cells[key] ?? { w: "", r: "" };
+    setMsg(null);
+    setBusyKey(key);
+    start(async () => {
+      try {
+        const ex = exercises.find((x) => x.id === exId);
+        const lastKg = lastByExercise[exId];
+        const w =
+          cur.w.trim() !== ""
+            ? cur.w
+            : lastKg !== undefined
+              ? toDisplay(lastKg, unit)
+              : "";
+        const r = cur.r.trim() !== "" ? cur.r : ex ? defaultReps(ex.reps) : "";
+        let merged = cells;
+        if (w !== cur.w || r !== cur.r) {
+          merged = { ...cells, [key]: { w, r } };
+          setCells(merged);
+        }
+        if (!w.trim() || !r.trim()) {
+          const target = !w.trim() ? `w:${key}` : `r:${key}`;
+          requestAnimationFrame(() => {
+            fieldRefs.current.get(target)?.focus();
+          });
+          setMsg("Completa peso y reps para enviar la serie.");
+          return;
+        }
+        const sets = collectSetsFrom(merged);
+        const id = await ensureSession();
+        const res = await saveSetLogs(id, unit, sets, {
+          completed,
+          notes,
+        });
+        setMsg(`Serie enviada ✓ · ${res.count} guardadas.`);
+      } catch (err) {
+        setMsg(err instanceof Error ? err.message : "No se pudo guardar");
+      } finally {
+        setBusyKey(null);
+      }
+    });
+  }
+
   const filledSets = useMemo(() => {
     let n = 0;
     for (const key of Object.keys(cells)) {
@@ -155,12 +218,14 @@ export function SessionTracker({
     return id;
   }
 
-  function collectSets(): SetInput[] {
+  function collectSetsFrom(
+    c: Record<string, { w: string; r: string }>,
+  ): SetInput[] {
     const out: SetInput[] = [];
     for (const e of exercises) {
       const rows = rowCounts[e.id] ?? e.sets;
       for (let s = 1; s <= rows; s++) {
-        const cell = cells[`${e.id}:${s}`];
+        const cell = c[`${e.id}:${s}`];
         if (!cell) continue;
         const w = Number(cell.w.replace(",", "."));
         const r = Number.parseInt(cell.r, 10);
@@ -172,6 +237,10 @@ export function SessionTracker({
       }
     }
     return out;
+  }
+
+  function collectSets(): SetInput[] {
+    return collectSetsFrom(cells);
   }
 
   function onSave(markCompleted?: boolean) {
@@ -298,6 +367,8 @@ export function SessionTracker({
                   const cell = cells[`${e.id}:${s}`] ?? { w: "", r: "" };
                   const done =
                     cell.w.trim() !== "" && cell.r.trim() !== "";
+                  const setKey = `${e.id}:${s}`;
+                  const busy = busyKey === setKey;
                   return (
                     <div
                       key={s}
@@ -328,6 +399,7 @@ export function SessionTracker({
                           aria-label={`Peso serie ${s} de ${e.name}`}
                           placeholder="—"
                           value={cell.w}
+                          ref={fieldRef(`w:${e.id}:${s}`)}
                           onChange={(ev) =>
                             setCell(e.id, s, { w: ev.target.value })
                           }
@@ -356,6 +428,7 @@ export function SessionTracker({
                           aria-label={`Reps serie ${s} de ${e.name}`}
                           placeholder="—"
                           value={cell.r}
+                          ref={fieldRef(`r:${e.id}:${s}`)}
                           onChange={(ev) =>
                             setCell(e.id, s, { r: ev.target.value })
                           }
@@ -370,20 +443,38 @@ export function SessionTracker({
                           +
                         </button>
                       </div>
-                      <span
-                        className={`inline-flex h-8 w-8 items-center justify-center justify-self-center rounded-lg ${
+                      <button
+                        type="button"
+                        onClick={() => quickComplete(e.id, s)}
+                        disabled={pending}
+                        aria-label={
+                          done
+                            ? `Serie ${s} de ${e.name} lista, tocar para enviar`
+                            : `Completar y enviar serie ${s} de ${e.name}`
+                        }
+                        title={
+                          done
+                            ? "Serie lista · tocar para enviar"
+                            : "Tocar para completar y enviar"
+                        }
+                        className={`inline-flex h-8 w-8 cursor-pointer items-center justify-center justify-self-center rounded-lg transition-all hover:ring-2 hover:ring-pcont disabled:opacity-60 ${
                           done
                             ? "bg-primary text-onprimary shadow-[0_0_12px_-2px_rgba(132,204,22,0.4)]"
                             : "bg-slow text-outlinevar"
                         }`}
-                        title={done ? "Serie lista" : "Serie pendiente"}
                       >
                         <Icon
-                          name={done ? "check" : "radio_button_unchecked"}
+                          name={
+                            busy
+                              ? "hourglass_top"
+                              : done
+                                ? "check"
+                                : "radio_button_unchecked"
+                          }
                           className="text-[20px]"
-                          filled={done}
+                          filled={done && !busy}
                         />
-                      </span>
+                      </button>
                     </div>
                   );
                 })}

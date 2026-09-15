@@ -1,7 +1,7 @@
 "use server";
 
 import { and, eq, inArray } from "drizzle-orm";
-import { revalidatePath } from "next/cache";
+import { refresh, revalidatePath } from "next/cache";
 import { auth } from "@/auth";
 import { db } from "@/db";
 import {
@@ -59,6 +59,9 @@ async function getRoutineOrThrow(routineId: number, userId: string) {
 
 function refreshAll() {
   revalidatePath("/", "layout");
+  // Sin esto el cliente conserva el árbol anterior y el toggle kg/lb
+  // escribe en BD pero la UI sigue mostrando la unidad vieja.
+  refresh();
 }
 
 export async function startSession(routineId: number, date?: string) {

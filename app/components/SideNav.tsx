@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Icon } from "@/app/components/Icon";
 import { SideNavLinks } from "@/app/components/NavLinks";
 
@@ -5,7 +6,11 @@ export function SideNav() {
   return (
     <aside className="fixed inset-y-0 left-0 z-50 hidden w-72 flex-col justify-between bg-slowest p-6 lg:flex">
       <div className="flex flex-col gap-8">
-        <div className="flex items-center gap-2 px-1">
+        <Link
+          href="/"
+          aria-label="Ir al inicio"
+          className="flex items-center gap-2 rounded-xl px-1 transition-opacity hover:opacity-80"
+        >
           <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-pcont text-onpcont shadow-[0_0_16px_-2px_rgba(132,204,22,0.4)]">
             <Icon name="fitness_center" className="text-[22px]" />
           </span>
@@ -17,7 +22,7 @@ export function SideNav() {
               Training Tracker
             </span>
           </div>
-        </div>
+        </Link>
         <SideNavLinks />
       </div>
       <div className="flex flex-col gap-2 rounded-xl bg-slow p-4">
