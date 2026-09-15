@@ -5,6 +5,8 @@ import { db } from "@/db";
 import { users } from "@/db/schema";
 import { Icon } from "@/app/components/Icon";
 import { UnitToggle } from "@/app/components/UnitToggle";
+import { parseDateStr } from "@/lib/dates";
+import { getRequestToday } from "@/lib/requestDate";
 
 async function signInAction() {
   "use server";
@@ -17,13 +19,13 @@ async function signOutAction() {
 }
 
 const WEEKDAYS = [
-  "Domingo",
   "Lunes",
   "Martes",
   "Miércoles",
   "Jueves",
   "Viernes",
   "Sábado",
+  "Domingo",
 ];
 const MONTHS = [
   "Enero",
@@ -42,8 +44,10 @@ const MONTHS = [
 
 export async function TopBar() {
   const session = await auth();
-  const now = new Date();
-  const dateLabel = `${WEEKDAYS[now.getDay()]}, ${now.getDate()} ${MONTHS[now.getMonth()]}`;
+  // "Hoy" según el navegador del usuario (no la hora UTC del servidor),
+  // igual que el resto de la app. 0=Lun … 6=Dom.
+  const now = parseDateStr(await getRequestToday());
+  const dateLabel = `${WEEKDAYS[(now.getDay() + 6) % 7]}, ${now.getDate()} ${MONTHS[now.getMonth()]}`;
 
   let unit: "kg" | "lb" = "kg";
   if (session?.user?.id) {
