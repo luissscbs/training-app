@@ -9,10 +9,7 @@ import { ExerciseThumb } from "@/app/components/ExerciseThumb";
 import { Icon } from "@/app/components/Icon";
 import { IMAGE_CREDIT } from "@/lib/exerciseMedia";
 import { formatWeight } from "@/lib/units";
-
-function toStr(d: Date): string {
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-}
+import { getRequestToday } from "@/lib/requestDate";
 
 export default async function RutinaCustomPage({
   params,
@@ -42,7 +39,8 @@ export default async function RutinaCustomPage({
     .where(eq(users.id, userId));
   const unit: "kg" | "lb" = userRows[0]?.unit === "lb" ? "lb" : "kg";
 
-  const today = toStr(new Date());
+  // "Hoy" según el navegador del usuario (no la hora UTC del servidor).
+  const today = await getRequestToday();
   const date =
     dateParam &&
     /^\d{4}-\d{2}-\d{2}$/.test(dateParam) &&

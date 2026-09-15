@@ -9,6 +9,8 @@ import { ExerciseThumb } from "@/app/components/ExerciseThumb";
 import { Icon } from "@/app/components/Icon";
 import { IMAGE_CREDIT } from "@/lib/exerciseMedia";
 import { formatWeight } from "@/lib/units";
+import { parseDateStr } from "@/lib/dates";
+import { getRequestToday } from "@/lib/requestDate";
 
 const DAYS = [
   "Lunes",
@@ -59,8 +61,9 @@ export default async function RutinaPage({
 
   // Fecha a registrar: la pedida (?date=) si es válida y cae en este día,
   // si no la ocurrencia más reciente (hoy o días pasados, nunca futuro).
-  const now = new Date();
-  const today = toStr(now);
+  // "Hoy" según el navegador del usuario (no la hora UTC del servidor).
+  const today = await getRequestToday();
+  const now = parseDateStr(today);
   const todayWeekday = (now.getDay() + 6) % 7;
   const recent = new Date(now);
   recent.setDate(now.getDate() - ((todayWeekday - weekday + 7) % 7));

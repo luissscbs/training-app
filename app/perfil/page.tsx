@@ -6,10 +6,7 @@ import { bodyWeights, users } from "@/db/schema";
 import { Icon } from "@/app/components/Icon";
 import { ProfileForm, WeightLogForm } from "@/app/components/ProfileForms";
 import { formatWeight, kgToLb } from "@/lib/units";
-
-function toStr(d: Date): string {
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-}
+import { getRequestToday } from "@/lib/requestDate";
 
 function bmiCategory(bmi: number): { label: string; cls: string } {
   if (bmi < 18.5) return { label: "Bajo peso", cls: "text-secondary" };
@@ -146,7 +143,7 @@ export default async function PerfilPage() {
               Peso corporal
             </h2>
             <div className="mt-3">
-              <WeightLogForm key={unit} unit={unit} today={toStr(new Date())} />
+                <WeightLogForm key={unit} unit={unit} today={await getRequestToday()} />
             </div>
             {points.length > 1 ? (
               <div className="mt-4 rounded-xl bg-scont p-3">

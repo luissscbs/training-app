@@ -8,6 +8,8 @@ import { Icon } from "@/app/components/Icon";
 import { WeekDayCard, type DayCardData } from "@/app/components/WeekDayCard";
 import { getWeekPlan } from "@/lib/schedule";
 import { formatWeight } from "@/lib/units";
+import { parseDateStr } from "@/lib/dates";
+import { getRequestToday } from "@/lib/requestDate";
 
 const DAY_ABBR = ["LUN", "MAR", "MIÉ", "JUE", "VIE", "SÁB", "DOM"];
 const DAY_NAMES = [
@@ -47,7 +49,8 @@ export default async function SemanaPage() {
     weightKg && heightCm ? weightKg / Math.pow(heightCm / 100, 2) : null;
   const bmiCat = bmi !== null ? bmiCategory(bmi) : null;
 
-  const now = new Date();
+  // "Hoy" según el navegador del usuario (no la hora UTC del servidor).
+  const now = parseDateStr(await getRequestToday());
   const todayWeekday = (now.getDay() + 6) % 7;
   const monday = new Date(now);
   monday.setDate(now.getDate() - todayWeekday);

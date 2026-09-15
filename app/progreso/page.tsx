@@ -7,6 +7,8 @@ import { sessions, users } from "@/db/schema";
 import { UnitToggle } from "@/app/components/UnitToggle";
 import { Icon } from "@/app/components/Icon";
 import { formatWeight } from "@/lib/units";
+import { shiftDateStr } from "@/lib/dates";
+import { getRequestToday } from "@/lib/requestDate";
 
 export default async function ProgresoPage() {
   const session = await auth();
@@ -52,9 +54,8 @@ export default async function ProgresoPage() {
   );
   const maxVolume = Math.max(1, ...rows.map((r) => r.volumeKg));
 
-  const weekAgo = new Date();
-  weekAgo.setDate(weekAgo.getDate() - 7);
-  const weekAgoStr = weekAgo.toISOString().slice(0, 10);
+  // "Hoy" según el navegador del usuario (no la hora UTC del servidor).
+  const weekAgoStr = shiftDateStr(await getRequestToday(), -7);
   const lastWeek = rows.filter((r) => r.completed && r.date >= weekAgoStr).length;
 
   const prs = new Map<string, number>();

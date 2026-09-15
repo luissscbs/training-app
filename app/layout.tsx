@@ -4,6 +4,7 @@ import "./globals.css";
 import { SideNav } from "@/app/components/SideNav";
 import { TopBar } from "@/app/components/TopBar";
 import { MobileNav } from "@/app/components/NavLinks";
+import { LocalDateSync } from "@/app/components/LocalDateSync";
 
 const jakarta = Plus_Jakarta_Sans({
   variable: "--font-jakarta",
@@ -28,6 +29,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         />
       </head>
       <body suppressHydrationWarning className="min-h-full font-sans antialiased">
+        <LocalDateSync />
         <SideNav />
         <div className="lg:pl-72">
           <TopBar />

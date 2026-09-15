@@ -14,29 +14,19 @@ import {
   users,
 } from "@/db/schema";
 import { lbToKg } from "@/lib/units";
-import { dateWeekday } from "@/lib/dates";
-
-function todayStr(d = new Date()): string {
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, "0");
-  const day = String(d.getDate()).padStart(2, "0");
-  return `${y}-${m}-${day}`;
-}
-
-function daysAgoStr(n: number): string {
-  const d = new Date();
-  d.setDate(d.getDate() - n);
-  return todayStr(d);
-}
+import { dateWeekday, shiftDateStr } from "@/lib/dates";
+import { getRequestToday } from "@/lib/requestDate";
 
 /** Fecha YYYY-MM-DD válida, no futura y de como mucho un año atrás. */
-function assertLoggableDate(date: string): void {
+async function assertLoggableDate(date: string): Promise<void> {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) throw new Error("Fecha inválida");
   const d = new Date(`${date}T00:00:00`);
   if (Number.isNaN(d.getTime())) throw new Error("Fecha inválida");
-  const today = todayStr();
+  // "Hoy" según el navegador del usuario (no la hora UTC del servidor).
+  const today = await getRequestToday();
   if (date > today) throw new Error("No se puede registrar en el futuro");
-  if (date < daysAgoStr(365)) throw new Error("Fecha demasiado antigua");
+  if (date < shiftDateStr(today, -365))
+    throw new Error("Fecha demasiado antigua");
 }
 
 async function requireUserId(): Promise<string> {
@@ -66,8 +56,8 @@ function refreshAll() {
 
 export async function startSession(routineId: number, date?: string) {
   const userId = await requireUserId();
-  const day = date ?? todayStr();
-  assertLoggableDate(day);
+  const day = date ?? (await getRequestToday());
+  await assertLoggableDate(day);
 
   const routine = await getRoutineOrThrow(routineId, userId);
   // Las plantillas fijas solo se registran en su día de la semana.
@@ -282,7 +272,7 @@ export async function updateProfile(opts: {
 
 export async function logBodyWeight(date: string, weight: number, unit: "kg" | "lb") {
   const userId = await requireUserId();
-  assertLoggableDate(date);
+  await assertLoggableDate(date);
   if (!Number.isFinite(weight) || weight < 20 || weight > 500) {
     throw new Error("Peso inválido");
   }

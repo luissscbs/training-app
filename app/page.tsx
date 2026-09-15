@@ -7,6 +7,8 @@ import { UnitToggle } from "@/app/components/UnitToggle";
 import { Icon } from "@/app/components/Icon";
 import { formatWeight } from "@/lib/units";
 import { getWeekPlan } from "@/lib/schedule";
+import { dateWeekday, shiftDateStr } from "@/lib/dates";
+import { getRequestToday } from "@/lib/requestDate";
 
 const DAYS = [
   "Lunes",
@@ -23,18 +25,14 @@ async function signInAction() {
   await signIn("google");
 }
 
-function todayParts(): { weekday: number; date: string } {
-  const now = new Date();
-  return {
-    weekday: (now.getDay() + 6) % 7,
-    date: `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`,
-  };
+async function todayParts(): Promise<{ weekday: number; date: string }> {
+  // "Hoy" según el navegador del usuario (no la hora UTC del servidor).
+  const date = await getRequestToday();
+  return { weekday: dateWeekday(date), date };
 }
 
-function weekAgoStr(days: number): string {
-  const d = new Date();
-  d.setDate(d.getDate() - days);
-  return d.toISOString().slice(0, 10);
+function weekAgoStr(today: string, days: number): string {
+  return shiftDateStr(today, -days);
 }
 
 const MUSCLE_COLORS = [
@@ -54,7 +52,7 @@ const MUSCLE_TEXT = [
 
 export default async function Home() {
   const session = await auth();
-  const { weekday: todayWeekday, date: todayDate } = todayParts();
+  const { weekday: todayWeekday, date: todayDate } = await todayParts();
 
   // ---- Datos de usuario (solo login) ----
   let unit: "kg" | "lb" = "kg";
@@ -122,8 +120,8 @@ export default async function Home() {
     });
     totalSessions = recent.length;
     const ids = recent.map((s) => s.id);
-    const w7 = weekAgoStr(7);
-    const w14 = weekAgoStr(14);
+    const w7 = weekAgoStr(todayDate, 7);
+    const w14 = weekAgoStr(todayDate, 14);
     const last7Ids = new Set(
       recent.filter((s) => s.date >= w7).map((s) => s.id),
     );
