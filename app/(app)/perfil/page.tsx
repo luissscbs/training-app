@@ -9,15 +9,15 @@ import { formatWeight, kgToLb } from "@/lib/units";
 import { getRequestToday } from "@/lib/requestDate";
 
 function bmiCategory(bmi: number): { label: string; cls: string } {
-  if (bmi < 18.5) return { label: "Bajo peso", cls: "text-secondary" };
-  if (bmi < 25) return { label: "Saludable", cls: "text-tertiary" };
-  if (bmi < 30) return { label: "Sobrepeso", cls: "text-primary" };
-  return { label: "Obesidad", cls: "text-error" };
+  if (bmi < 18.5) return { label: "Bajo peso", cls: "text-[#0EA5E9]" };
+  if (bmi < 25) return { label: "Saludable", cls: "text-[#22C55E]" };
+  if (bmi < 30) return { label: "Sobrepeso", cls: "text-brand-500" };
+  return { label: "Obesidad", cls: "text-red-600" };
 }
 
 export default async function PerfilPage() {
   const session = await auth();
-  if (!session?.user?.id) redirect("/");
+  if (!session?.user?.id) redirect("/login");
   const userId = session.user.id;
 
   const rows = await db
@@ -73,23 +73,24 @@ export default async function PerfilPage() {
       : "";
 
   return (
-    <main className="relative mx-auto flex w-full max-w-7xl flex-col gap-5 pb-8">
-      <div className="pointer-events-none absolute -top-24 right-1/4 h-96 w-96 rounded-full bg-tertiary/10 blur-3xl" />
-
-      <div className="relative z-10 flex flex-col">
-        <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl">
+    <main className="mt-6 space-y-5">
+      <div className="px-2 lg:px-6">
+        <h1 className="mb-1 text-[28px] font-medium leading-8 text-text-primary">
           Perfil de atleta
         </h1>
-        <p className="text-sm text-onvariant">
+        <p className="text-sm leading-5 text-text-tertiary">
           Peso, altura e IMC. El peso se guarda en kg y se convierte a tu unidad.
         </p>
       </div>
 
-      <div className="relative z-10 grid grid-cols-1 items-start gap-5 lg:grid-cols-12">
+      <div className="space-y-5 px-2 lg:px-5">
+      <div className="grid grid-cols-1 items-start gap-5 lg:grid-cols-12">
         <div className="flex flex-col gap-5 lg:col-span-5">
-          <section className="rounded-xl bg-slow p-5 shadow-md sm:p-6">
-            <h2 className="flex items-center gap-2 text-lg font-semibold">
-              <Icon name="person" className="text-[20px] text-primary" />
+          <section className="rounded-xl border-[0.5px] border-card-border bg-card-background p-5 sm:p-6">
+            <h2 className="flex items-center gap-2 font-semibold leading-6 tracking-[-0.2px] text-text-primary">
+              <span className="flex size-8 items-center justify-center rounded-lg bg-brand-500/10 text-brand-500">
+                <Icon name="person" className="text-[18px]" />
+              </span>
               Mis datos
             </h2>
             <div className="mt-3">
@@ -102,31 +103,31 @@ export default async function PerfilPage() {
             </div>
           </section>
 
-          <section className="grid grid-cols-2 gap-3">
-            <div className="rounded-xl bg-slow p-4 shadow-md">
-              <span className="text-xs font-semibold uppercase tracking-wider text-onvariant">
+          <section className="grid grid-cols-2 gap-5">
+            <div className="rounded-xl border-[0.5px] border-card-border bg-card-background p-5">
+              <span className="text-xs font-medium uppercase tracking-wider text-text-tertiary">
                 IMC
               </span>
-              <p className="tabular mt-1 text-3xl font-extrabold">
+              <p className="tabular mt-1 text-3xl font-semibold text-text-primary">
                 {bmi !== null ? bmi.toFixed(1) : "—"}
               </p>
-              {cat && <p className={`text-xs font-bold ${cat.cls}`}>{cat.label}</p>}
+              {cat && <p className={`text-xs font-medium ${cat.cls}`}>{cat.label}</p>}
               {!bmi && (
-                <p className="text-xs text-onvariant">Faltan peso y altura</p>
+                <p className="text-xs text-text-tertiary">Faltan peso y altura</p>
               )}
             </div>
-            <div className="rounded-xl bg-slow p-4 shadow-md">
-              <span className="text-xs font-semibold uppercase tracking-wider text-onvariant">
+            <div className="rounded-xl border-[0.5px] border-card-border bg-card-background p-5">
+              <span className="text-xs font-medium uppercase tracking-wider text-text-tertiary">
                 Peso actual
               </span>
-              <p className="tabular mt-1 text-3xl font-extrabold">
+              <p className="tabular mt-1 text-3xl font-semibold text-text-primary">
                 {weightKg !== null ? formatWeight(weightKg, unit).split(" ")[0] : "—"}
                 {weightKg !== null && (
-                  <span className="ml-1 text-sm font-bold text-primary">{unit}</span>
+                  <span className="ml-1 text-sm font-medium text-brand-500">{unit}</span>
                 )}
               </p>
               {delta !== null && history.length > 1 && (
-                <p className="tabular text-xs text-onvariant">
+                <p className="tabular text-xs text-text-tertiary">
                   {delta >= 0 ? "+" : ""}
                   {(unit === "kg" ? delta : delta * 2.20462).toFixed(1)} {unit}{" "}
                   desde el primer registro
@@ -137,20 +138,22 @@ export default async function PerfilPage() {
         </div>
 
         <div className="lg:col-span-7">
-          <section className="rounded-xl bg-slow p-5 shadow-md sm:p-6">
-            <h2 className="flex items-center gap-2 text-lg font-semibold">
-              <Icon name="monitoring" className="text-[20px] text-secondary" />
+          <section className="rounded-xl border-[0.5px] border-card-border bg-card-background p-5 sm:p-6">
+            <h2 className="flex items-center gap-2 font-semibold leading-6 tracking-[-0.2px] text-text-primary">
+              <span className="flex size-8 items-center justify-center rounded-lg bg-[rgba(59,130,246,0.10)] text-[#3B82F6]">
+                <Icon name="monitoring" className="text-[18px]" />
+              </span>
               Peso corporal
             </h2>
             <div className="mt-3">
                 <WeightLogForm key={unit} unit={unit} today={await getRequestToday()} />
             </div>
             {points.length > 1 ? (
-              <div className="mt-4 rounded-xl bg-scont p-3">
+              <div className="mt-4 rounded-xl bg-background-gray-secondary p-3">
                 <svg viewBox={`0 0 ${W} ${H}`} className="h-28 w-full" preserveAspectRatio="none">
-                  <path d={path} fill="none" stroke="#9ee939" strokeWidth="2.5" strokeLinecap="round" />
+                  <path d={path} fill="none" stroke="#5750F1" strokeWidth="2.5" strokeLinecap="round" />
                 </svg>
-                <div className="tabular flex justify-between text-[10px] text-onvariant">
+                <div className="tabular flex justify-between text-[10px] text-text-tertiary">
                   <span>{points[0].date}</span>
                   <span>
                     mín. {formatWeight(min, unit)} · máx. {formatWeight(max, unit)}
@@ -159,19 +162,19 @@ export default async function PerfilPage() {
                 </div>
               </div>
             ) : (
-              <p className="mt-3 text-sm text-onvariant">
+              <p className="mt-3 text-sm text-text-tertiary">
                 Registra tu peso cada mañana para ver la curva aquí.
               </p>
             )}
             {history.length > 0 && (
-              <ul className="mt-3 flex max-h-64 flex-col gap-1.5 overflow-y-auto">
+              <ul className="scrollbar-thin mt-3 flex max-h-64 flex-col gap-1.5 overflow-y-auto">
                 {[...history].reverse().slice(0, 30).map((h) => (
                   <li
                     key={h.id}
-                    className="tabular flex justify-between rounded-lg bg-scont px-3 py-1.5 text-sm"
+                    className="tabular flex justify-between rounded-lg bg-background-gray-secondary px-3 py-1.5 text-sm"
                   >
-                    <span>{h.date}</span>
-                    <span className="font-bold">
+                    <span className="text-text-secondary">{h.date}</span>
+                    <span className="font-medium text-text-primary">
                       {formatWeight(Number(h.weightKg), unit)}
                     </span>
                   </li>
@@ -180,6 +183,7 @@ export default async function PerfilPage() {
             )}
           </section>
         </div>
+      </div>
       </div>
     </main>
   );

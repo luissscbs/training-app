@@ -47,7 +47,7 @@ export function ProfileForm({
     <div className="flex flex-col gap-3">
       <div className="grid gap-3 sm:grid-cols-2">
         <label className="block">
-          <span className="text-xs font-semibold uppercase tracking-wider text-onvariant">
+          <span className="text-xs font-medium uppercase tracking-wider text-text-tertiary">
             Peso corporal ({unit})
           </span>
           <input
@@ -55,11 +55,11 @@ export function ProfileForm({
             onChange={(e) => setWeight(e.target.value)}
             inputMode="decimal"
             placeholder="p. ej. 78"
-            className="tabular mt-1 w-full rounded-lg border border-white/10 bg-slowest px-3 py-2 text-sm focus:border-pcont focus:outline-none"
+            className="tabular mt-1 w-full rounded-lg border border-card-border bg-input-background px-3 py-2 text-sm text-text-primary placeholder:text-input-placeholder-text focus:border-input-primary-focus-border focus:outline-none"
           />
         </label>
         <label className="block">
-          <span className="text-xs font-semibold uppercase tracking-wider text-onvariant">
+          <span className="text-xs font-medium uppercase tracking-wider text-text-tertiary">
             Altura (cm)
           </span>
           <input
@@ -67,12 +67,12 @@ export function ProfileForm({
             onChange={(e) => setHeight(e.target.value)}
             inputMode="decimal"
             placeholder="p. ej. 178"
-            className="tabular mt-1 w-full rounded-lg border border-white/10 bg-slowest px-3 py-2 text-sm focus:border-pcont focus:outline-none"
+            className="tabular mt-1 w-full rounded-lg border border-card-border bg-input-background px-3 py-2 text-sm text-text-primary placeholder:text-input-placeholder-text focus:border-input-primary-focus-border focus:outline-none"
           />
         </label>
       </div>
       {msg && (
-        <p role="status" className="rounded-lg bg-scont p-2.5 text-center text-sm">
+        <p role="status" className="rounded-lg bg-background-gray-secondary p-2.5 text-center text-sm text-text-primary">
           {msg}
         </p>
       )}
@@ -80,7 +80,7 @@ export function ProfileForm({
         type="button"
         disabled={pending}
         onClick={onSave}
-        className="flex items-center justify-center gap-2 rounded-xl bg-pcont px-5 py-2.5 text-sm font-extrabold text-onpcont transition-all hover:scale-[1.01] disabled:opacity-50"
+        className="flex h-11 items-center justify-center gap-2 rounded-lg bg-button-primary-background px-5 text-sm font-medium text-white transition-colors hover:bg-button-primary-hover-background disabled:opacity-50"
       >
         <Icon name="save" className="text-[20px]" />
         {pending ? "Guardando…" : "Guardar perfil"}
@@ -121,7 +121,7 @@ export function WeightLogForm({ unit, today }: { unit: "kg" | "lb"; today: strin
           max={today}
           onChange={(e) => setDate(e.target.value)}
           aria-label="Fecha del pesaje"
-          className="rounded-lg border border-white/10 bg-slowest px-2 py-2 text-xs [color-scheme:dark]"
+          className="rounded-lg border border-card-border bg-input-background px-2 py-2 text-xs text-text-primary [color-scheme:light_dark] focus:border-input-primary-focus-border focus:outline-none"
         />
         <input
           value={weight}
@@ -129,19 +129,19 @@ export function WeightLogForm({ unit, today }: { unit: "kg" | "lb"; today: strin
           inputMode="decimal"
           placeholder={`Peso (${unit})`}
           aria-label={`Peso en ${unit}`}
-          className="tabular w-full rounded-lg border border-white/10 bg-slowest px-3 py-2 text-sm focus:border-pcont focus:outline-none"
+          className="tabular w-full rounded-lg border border-card-border bg-input-background px-3 py-2 text-sm text-text-primary placeholder:text-input-placeholder-text focus:border-input-primary-focus-border focus:outline-none"
         />
         <button
           type="button"
           disabled={pending || !weight}
           onClick={onLog}
-          className="shrink-0 rounded-lg bg-shigh px-4 py-2 text-xs font-bold hover:bg-sbright disabled:opacity-50"
+          className="shrink-0 rounded-lg bg-background-gray-secondary px-4 py-2 text-xs font-medium text-text-primary transition-colors hover:bg-background-gray-tertiary disabled:opacity-50"
         >
           {pending ? "…" : "Añadir"}
         </button>
       </div>
       {msg && (
-        <p role="status" className="rounded-lg bg-scont p-2 text-center text-xs">
+        <p role="status" className="rounded-lg bg-background-gray-secondary p-2 text-center text-xs text-text-primary">
           {msg}
         </p>
       )}

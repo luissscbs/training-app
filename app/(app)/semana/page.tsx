@@ -23,10 +23,10 @@ const DAY_NAMES = [
 ];
 
 function bmiCategory(bmi: number): { label: string; cls: string } {
-  if (bmi < 18.5) return { label: "Bajo peso", cls: "text-secondary" };
-  if (bmi < 25) return { label: "Saludable", cls: "text-tertiary" };
-  if (bmi < 30) return { label: "Sobrepeso", cls: "text-primary" };
-  return { label: "Obesidad", cls: "text-error" };
+  if (bmi < 18.5) return { label: "Bajo peso", cls: "text-[#0EA5E9]" };
+  if (bmi < 25) return { label: "Saludable", cls: "text-[#22C55E]" };
+  if (bmi < 30) return { label: "Sobrepeso", cls: "text-brand-500" };
+  return { label: "Obesidad", cls: "text-red-600" };
 }
 
 function toStr(d: Date): string {
@@ -35,7 +35,7 @@ function toStr(d: Date): string {
 
 export default async function SemanaPage() {
   const session = await auth();
-  if (!session?.user?.id) redirect("/");
+  if (!session?.user?.id) redirect("/login");
   const userId = session.user.id;
 
   const userRows = await db
@@ -177,63 +177,62 @@ export default async function SemanaPage() {
   );
 
   return (
-    <main className="relative mx-auto flex w-full max-w-3xl flex-col gap-5 pb-8">
-      <div className="pointer-events-none absolute -top-24 right-1/4 h-96 w-96 rounded-full bg-primary/10 blur-3xl" />
-
-      <div className="relative z-10 flex flex-wrap items-end justify-between gap-3">
-        <div className="flex max-w-2xl flex-col gap-1">
-          <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl">
+    <main className="mt-6 space-y-5">
+      <div className="flex flex-wrap items-end justify-between gap-3 px-2 lg:px-6">
+        <div>
+          <h1 className="mb-1 text-[28px] font-medium leading-8 text-text-primary">
             Semana
           </h1>
-          <p className="text-sm capitalize text-onvariant">{rangeLabel}</p>
+          <p className="text-sm capitalize leading-5 text-text-tertiary">{rangeLabel}</p>
         </div>
         <div className="flex flex-wrap gap-2">
           {plan.configured && (
             <Link
               href="/rutinas#mi-semana"
-              className="tabular flex items-center gap-1.5 rounded-xl bg-slow px-4 py-2 text-sm font-bold hover:bg-scont"
+              className="tabular flex items-center gap-1.5 rounded-lg border border-card-border bg-card-background px-4 py-2 text-sm font-medium text-text-primary shadow-xs transition-colors hover:bg-background-gray-secondary"
             >
-              <Icon name="edit_calendar" className="text-[18px] text-primary" />
+              <Icon name="edit_calendar" className="text-[18px] text-brand-500" />
               {trainDays}/7 entreno
             </Link>
           )}
-          <span className="tabular flex items-center gap-1.5 rounded-xl bg-slow px-4 py-2 text-sm font-bold">
-            <Icon name="verified" className="text-[18px] text-tertiary" />
+          <span className="tabular flex items-center gap-1.5 rounded-lg border border-card-border bg-card-background px-4 py-2 text-sm font-medium text-text-primary shadow-xs">
+            <Icon name="verified" className="text-[18px] text-[#22C55E]" />
             {doneCount}/7 hechas
           </span>
         </div>
       </div>
 
+      <div className="space-y-5 px-2 lg:px-5">
       {/* ---- Hoy toca ---- */}
       {todayItem ? (
         todayItem.kind === "day" ? (
-          <section className="relative z-10 flex flex-col gap-3 rounded-xl bg-scont p-4 shadow-lg sm:flex-row sm:items-center sm:justify-between sm:p-5">
+          <section className="flex flex-col gap-3 rounded-xl border-[0.5px] border-card-border bg-card-background p-5 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex min-w-0 flex-col">
-              <span className="text-[10px] font-bold uppercase tracking-widest text-primary">
+              <span className="text-xs font-medium uppercase tracking-wider text-text-tertiary">
                 Hoy · {DAY_NAMES[todayWeekday]}
                 {todayItem.day.custom ? " · mi rutina" : ""}
               </span>
-              <h2 className="truncate text-xl font-bold">
+              <h2 className="mt-1 truncate font-semibold leading-6 tracking-[-0.2px] text-text-primary">
                 {todayItem.day.title}
               </h2>
               {todayItem.day.focus && (
-                <p className="truncate text-sm text-onvariant">
+                <p className="truncate text-sm text-text-tertiary">
                   {todayItem.day.focus}
                 </p>
               )}
-              <span className="tabular mt-1 text-xs font-bold">
+              <span className="tabular mt-1 text-xs font-medium">
                 {todayItem.day.completed ? (
-                  <span className="text-tertiary">
+                  <span className="text-[#22C55E]">
                     ✓ Hecha
                     {todayItem.day.volumeKg > 0 &&
                       ` · ${formatWeight(todayItem.day.volumeKg, unit)}`}
                   </span>
                 ) : todayItem.day.hasSession ? (
-                  <span className="text-onvariant">
+                  <span className="text-text-tertiary">
                     {formatWeight(todayItem.day.volumeKg, unit)} · en curso
                   </span>
                 ) : (
-                  <span className="text-onvariant">Pendiente</span>
+                  <span className="text-text-tertiary">Pendiente</span>
                 )}
               </span>
             </div>
@@ -241,7 +240,7 @@ export default async function SemanaPage() {
               {todayItem.day.loggable && !todayItem.day.completed && (
                 <Link
                   href={todayItem.day.registerHref}
-                  className="flex items-center justify-center gap-1.5 rounded-xl bg-pcont px-5 py-2.5 text-sm font-extrabold text-onpcont transition-all hover:scale-[1.01]"
+                  className="flex h-10 items-center justify-center gap-1.5 rounded-lg bg-button-primary-background px-5 text-sm font-medium text-white transition-colors hover:bg-button-primary-hover-background"
                 >
                   <Icon name="edit" className="text-[18px]" />
                   Registrar hoy
@@ -249,7 +248,7 @@ export default async function SemanaPage() {
               )}
               <Link
                 href={todayItem.day.detailHref}
-                className="flex items-center justify-center gap-1.5 rounded-xl bg-shigh px-4 py-2.5 text-sm font-bold hover:bg-sbright"
+                className="flex h-10 items-center justify-center gap-1.5 rounded-lg border border-card-border bg-card-background px-4 text-sm font-medium text-text-primary transition-colors hover:bg-background-gray-secondary"
               >
                 <Icon name="visibility" className="text-[18px]" />
                 Ver ejercicios
@@ -257,19 +256,19 @@ export default async function SemanaPage() {
             </div>
           </section>
         ) : (
-          <section className="relative z-10 flex flex-col gap-3 rounded-xl bg-scont p-4 shadow-lg sm:flex-row sm:items-center sm:justify-between sm:p-5">
+          <section className="flex flex-col gap-3 rounded-xl border-[0.5px] border-card-border bg-card-background p-5 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex flex-col">
-              <span className="text-[10px] font-bold uppercase tracking-widest text-secondary">
+              <span className="text-xs font-medium uppercase tracking-wider text-text-tertiary">
                 Hoy · {DAY_NAMES[todayWeekday]} · descanso
               </span>
-              <h2 className="text-xl font-bold">Recupera y vuelve fuerte</h2>
-              <p className="text-sm text-onvariant">
+              <h2 className="mt-1 font-semibold leading-6 tracking-[-0.2px] text-text-primary">Recupera y vuelve fuerte</h2>
+              <p className="text-sm text-text-tertiary">
                 Día libre según tu plan.
               </p>
             </div>
             <Link
               href="/rutinas#mi-semana"
-              className="flex shrink-0 items-center justify-center gap-1.5 rounded-xl bg-shigh px-4 py-2.5 text-sm font-bold hover:bg-sbright"
+              className="flex h-10 shrink-0 items-center justify-center gap-1.5 rounded-lg border border-card-border bg-card-background px-4 text-sm font-medium text-text-primary transition-colors hover:bg-background-gray-secondary"
             >
               <Icon name="edit_calendar" className="text-[18px]" />
               Cambiar plan
@@ -278,33 +277,33 @@ export default async function SemanaPage() {
         )
       ) : null}
 
-      <div className="relative z-10 flex flex-col gap-2.5">
+      <div className="flex flex-col gap-2.5">
         {items.map((it) =>
           it.kind === "rest" ? (
             <div
               key={it.weekday}
-              className="flex items-center gap-3 rounded-xl border border-dashed border-white/15 bg-transparent p-3 opacity-80 sm:p-4"
+              className="flex items-center gap-3 rounded-xl border border-dashed border-card-border bg-transparent p-3 opacity-80 sm:p-4"
             >
-              <span className="flex h-12 w-12 shrink-0 flex-col items-center justify-center rounded-xl bg-slow text-onvariant">
-                <span className="text-[10px] font-bold uppercase tracking-wider">
+              <span className="flex h-12 w-12 shrink-0 flex-col items-center justify-center rounded-xl bg-background-gray-secondary text-text-tertiary">
+                <span className="text-[10px] font-medium uppercase tracking-wider">
                   {DAY_ABBR[it.weekday]}
                 </span>
-                <span className="tabular text-lg font-extrabold leading-none">
+                <span className="tabular text-lg font-semibold leading-none">
                   {dayNums[it.weekday]}
                 </span>
               </span>
               <span className="flex min-w-0 flex-1 flex-col">
-                <span className="flex items-center gap-1.5 text-sm font-bold text-onvariant">
+                <span className="flex items-center gap-1.5 text-sm font-medium text-text-secondary">
                   <Icon name="hotel" className="text-[18px]" />
                   Descanso
                 </span>
-                <span className="text-xs text-onvariant">
+                <span className="text-xs text-text-tertiary">
                   Día libre según tu plan
                 </span>
               </span>
               <Link
                 href="/rutinas#mi-semana"
-                className="shrink-0 rounded-lg bg-shigh px-3 py-1.5 text-xs font-bold text-onvariant hover:text-onsurface"
+                className="shrink-0 rounded-lg bg-background-gray-secondary px-3 py-1.5 text-xs font-medium text-text-secondary transition-colors hover:text-text-primary"
               >
                 Cambiar
               </Link>
@@ -316,56 +315,58 @@ export default async function SemanaPage() {
       </div>
 
       {/* ---- Mi estado: peso, IMC y volumen de la semana ---- */}
-      <section className="relative z-10 rounded-xl bg-slow p-4 shadow-md sm:p-5">
-        <h2 className="flex items-center gap-2 text-base font-bold">
-          <Icon name="favorite" className="text-[20px] text-tertiary" />
+      <section className="rounded-xl border-[0.5px] border-card-border bg-card-background p-5">
+        <h2 className="flex items-center gap-2 font-semibold leading-6 tracking-[-0.2px] text-text-primary">
+          <span className="flex size-8 items-center justify-center rounded-lg bg-[rgba(34,197,94,0.10)] text-[#22C55E]">
+            <Icon name="favorite" className="text-[18px]" />
+          </span>
           Mi estado
         </h2>
-        <div className="mt-3 grid grid-cols-3 gap-2 sm:gap-3">
-          <div className="flex flex-col rounded-xl bg-scont p-3">
-            <span className="text-[10px] font-semibold uppercase tracking-wider text-onvariant">
+        <div className="mt-4 grid grid-cols-3 gap-2 sm:gap-3">
+          <div className="flex flex-col rounded-xl bg-background-gray-secondary p-3">
+            <span className="text-[10px] font-medium uppercase tracking-wider text-text-tertiary">
               Peso
             </span>
-            <span className="tabular mt-1 text-xl font-extrabold sm:text-2xl">
+            <span className="tabular mt-1 text-xl font-semibold sm:text-2xl text-text-primary">
               {weightKg !== null
                 ? formatWeight(weightKg, unit).split(" ")[0]
                 : "—"}
               {weightKg !== null && (
-                <span className="ml-1 text-xs font-bold text-primary">
+                <span className="ml-1 text-xs font-medium text-brand-500">
                   {unit}
                 </span>
               )}
             </span>
           </div>
-          <div className="flex flex-col rounded-xl bg-scont p-3">
-            <span className="text-[10px] font-semibold uppercase tracking-wider text-onvariant">
+          <div className="flex flex-col rounded-xl bg-background-gray-secondary p-3">
+            <span className="text-[10px] font-medium uppercase tracking-wider text-text-tertiary">
               IMC
             </span>
-            <span className="tabular mt-1 text-xl font-extrabold sm:text-2xl">
+            <span className="tabular mt-1 text-xl font-semibold sm:text-2xl text-text-primary">
               {bmi !== null ? bmi.toFixed(1) : "—"}
             </span>
             {bmiCat ? (
-              <span className={`text-[11px] font-bold ${bmiCat.cls}`}>
+              <span className={`text-[11px] font-medium ${bmiCat.cls}`}>
                 {bmiCat.label}
               </span>
             ) : (
               <Link
                 href="/perfil"
-                className="text-[11px] font-bold text-secondary underline underline-offset-2"
+                className="text-[11px] font-medium text-[#0EA5E9] underline underline-offset-2"
               >
                 Completa tu perfil
               </Link>
             )}
           </div>
-          <div className="flex flex-col rounded-xl bg-scont p-3">
-            <span className="text-[10px] font-semibold uppercase tracking-wider text-onvariant">
+          <div className="flex flex-col rounded-xl bg-background-gray-secondary p-3">
+            <span className="text-[10px] font-medium uppercase tracking-wider text-text-tertiary">
               Volumen sem.
             </span>
-            <span className="tabular mt-1 text-xl font-extrabold sm:text-2xl">
+            <span className="tabular mt-1 text-xl font-semibold sm:text-2xl text-text-primary">
               {formatWeight(weekVolumeKg, unit).split(" ")[0]}
-              <span className="ml-1 text-xs font-bold text-primary">{unit}</span>
+              <span className="ml-1 text-xs font-medium text-brand-500">{unit}</span>
             </span>
-            <span className="tabular text-[11px] text-onvariant">
+            <span className="tabular text-[11px] text-text-tertiary">
               {doneCount}/{trainDays} sesiones
             </span>
           </div>
@@ -375,26 +376,29 @@ export default async function SemanaPage() {
       {!plan.configured && (
         <Link
           href="/rutinas#mi-semana"
-          className="relative z-10 flex items-center justify-between gap-3 rounded-xl border border-primary/30 bg-primary/10 p-4"
+          className="flex items-center justify-between gap-3 rounded-xl border-[0.5px] border-card-border bg-card-background p-5"
         >
           <span className="flex items-center gap-3">
-            <Icon name="edit_calendar" className="text-[24px] text-primary" />
+            <span className="flex size-8 items-center justify-center rounded-lg bg-brand-500/10 text-brand-500">
+              <Icon name="edit_calendar" className="text-[18px]" />
+            </span>
             <span className="flex flex-col">
-              <span className="text-sm font-bold">
+              <span className="font-semibold leading-6 tracking-[-0.2px] text-text-primary">
                 ¿Entrenas menos días o quieres descansos?
               </span>
-              <span className="text-xs text-onvariant">
+              <span className="text-sm text-text-tertiary">
                 Configura qué días entrenas y cuáles descansas.
               </span>
             </span>
           </span>
-          <Icon name="chevron_right" className="text-[20px] text-primary" />
+          <Icon name="chevron_right" className="text-[20px] text-text-tertiary" />
         </Link>
       )}
 
-      <p className="relative z-10 text-center text-[10px] text-onvariant">
+      <p className="text-center text-[10px] text-text-tertiary">
         Imágenes de ejercicios: free-exercise-db (GitHub, CC).
       </p>
+      </div>
     </main>
   );
 }

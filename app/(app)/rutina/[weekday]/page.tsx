@@ -44,7 +44,7 @@ export default async function RutinaPage({
   if (!Number.isInteger(weekday) || weekday < 0 || weekday > 6) notFound();
 
   const session = await auth();
-  if (!session?.user?.id) redirect("/");
+  if (!session?.user?.id) redirect("/login");
 
   const userId = session.user.id;
   const userRows = await db
@@ -133,29 +133,28 @@ export default async function RutinaPage({
   });
 
   return (
-    <main className="relative mx-auto flex w-full max-w-7xl flex-col gap-5 pb-8">
-      <div className="pointer-events-none absolute -top-24 right-1/4 h-96 w-96 rounded-full bg-primary/10 blur-3xl" />
-
-      <div className="relative z-10">
+    <main className="mt-6 space-y-5">
+      <div className="px-2 lg:px-6">
         <Link
           href="/semana"
-          className="flex w-fit items-center gap-1 text-sm text-onvariant hover:text-primary"
+          className="flex w-fit items-center gap-1 text-sm font-medium text-text-tertiary transition-colors hover:text-text-primary"
         >
           <Icon name="chevron_left" className="text-[18px]" />
           Semana
         </Link>
-        <h1 className="mt-2 text-3xl font-extrabold tracking-tight sm:text-4xl">
+        <h1 className="mb-1 mt-2 text-[28px] font-medium leading-8 text-text-primary">
           {DAYS[weekday]} — {routine.title}
         </h1>
         {routine.focus && (
-          <p className="mt-1 text-sm text-onvariant">{routine.focus}</p>
+          <p className="text-sm leading-5 text-text-tertiary">{routine.focus}</p>
         )}
       </div>
 
+      <div className="space-y-5 px-2 lg:px-5">
       {/* Selector de fecha: permite registrar días pasados */}
-      <div className="relative z-10 flex flex-wrap items-center gap-2 rounded-xl bg-slow p-4 shadow-md">
-        <span className="flex items-center gap-1.5 text-sm font-semibold">
-          <Icon name="calendar_month" className="text-[20px] text-primary" />
+      <div className="flex flex-wrap items-center gap-2 rounded-xl border-[0.5px] border-card-border bg-card-background p-4">
+        <span className="flex items-center gap-1.5 text-sm font-medium text-text-primary">
+          <Icon name="calendar_month" className="text-[20px] text-brand-500" />
           Sesión del
         </span>
         <div className="flex flex-wrap gap-1.5">
@@ -163,10 +162,10 @@ export default async function RutinaPage({
             <Link
               key={d}
               href={`/rutina/${weekday}?date=${d}#registro`}
-              className={`tabular rounded-lg px-3 py-1.5 text-xs font-bold transition-all ${
+              className={`tabular rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
                 d === date
-                  ? "bg-pcont text-onpcont shadow-[0_0_12px_-2px_rgba(132,204,22,0.4)]"
-                  : "bg-shigh text-onvariant hover:text-onsurface"
+                  ? "bg-button-primary-background text-white"
+                  : "bg-background-gray-secondary text-text-secondary hover:text-text-primary"
               }`}
             >
               {d === today ? "Hoy" : d.slice(5)}
@@ -179,23 +178,23 @@ export default async function RutinaPage({
             name="date"
             defaultValue={date}
             max={today}
-            className="rounded-lg border border-white/10 bg-slowest px-2 py-1.5 text-xs text-onsurface [color-scheme:dark]"
+            className="rounded-lg border border-card-border bg-input-background px-2 py-1.5 text-xs text-text-primary [color-scheme:light_dark] focus:border-input-primary-focus-border focus:outline-none"
           />
           <button
             type="submit"
-            className="rounded-lg bg-shigh px-3 py-1.5 text-xs font-bold hover:bg-sbright"
+            className="rounded-lg bg-background-gray-secondary px-3 py-1.5 text-xs font-medium text-text-primary transition-colors hover:bg-background-gray-tertiary"
           >
             Ir
           </button>
         </form>
         {!isToday && (
-          <span className="text-xs text-onvariant">
+          <span className="text-xs text-text-tertiary">
             Registrando un día pasado — nada se bloquea.
           </span>
         )}
       </div>
 
-      <div className="relative z-10 grid grid-cols-1 items-start gap-5 lg:grid-cols-12">
+      <div className="grid grid-cols-1 items-start gap-5 lg:grid-cols-12">
         <div className="lg:col-span-8">
           <SessionTracker
             key={`${routine.id}-${date}-${unit}`}
@@ -219,9 +218,9 @@ export default async function RutinaPage({
         </div>
 
         <div className="flex flex-col gap-5 lg:col-span-4">
-          <section className="rounded-xl bg-scont p-5 shadow-lg">
-            <h2 className="flex items-center gap-2 text-lg font-semibold">
-              <Icon name="lock" className="text-[18px] text-onvariant" />
+          <section className="rounded-xl border-[0.5px] border-card-border bg-card-background p-5">
+            <h2 className="flex items-center gap-2 font-semibold leading-6 tracking-[-0.2px] text-text-primary">
+              <Icon name="lock" className="text-[18px] text-text-tertiary" />
               Plantilla fija
             </h2>
             <ul className="mt-3 flex flex-col gap-2.5">
@@ -229,10 +228,10 @@ export default async function RutinaPage({
                 <li key={e.id} className="flex items-center gap-3">
                   <ExerciseThumb name={e.name} className="h-14 w-14" />
                   <span className="flex flex-1 flex-col">
-                    <span className="text-sm font-semibold leading-snug">
+                    <span className="text-sm font-medium leading-snug text-text-primary">
                       {e.name}
                     </span>
-                    <span className="tabular text-xs text-onvariant">
+                    <span className="tabular text-xs text-text-tertiary">
                       {e.sets} × {e.reps}
                       {e.muscle ? ` · ${e.muscle}` : ""}
                       {lastByExercise[e.id] !== undefined &&
@@ -242,13 +241,13 @@ export default async function RutinaPage({
                 </li>
               ))}
             </ul>
-            <p className="mt-4 text-[10px] text-onvariant">{IMAGE_CREDIT}</p>
+            <p className="mt-4 text-[10px] text-text-tertiary">{IMAGE_CREDIT}</p>
           </section>
 
-          <section className="rounded-xl bg-slow p-5 shadow-md">
-            <h2 className="text-lg font-semibold">Últimas sesiones</h2>
+          <section className="rounded-xl border-[0.5px] border-card-border bg-card-background p-5">
+            <h2 className="font-semibold leading-6 tracking-[-0.2px] text-text-primary">Últimas sesiones</h2>
             {history.length === 0 ? (
-              <p className="mt-2 text-sm text-onvariant">
+              <p className="mt-2 text-sm text-text-tertiary">
                 Sin registros para este día todavía.
               </p>
             ) : (
@@ -265,11 +264,11 @@ export default async function RutinaPage({
                   return (
                     <li
                       key={s.id}
-                      className="flex items-center justify-between rounded-xl border border-white/10 p-3 text-sm"
+                      className="flex items-center justify-between rounded-xl border border-card-border p-3 text-sm"
                     >
                       <div>
-                        <p className="tabular font-semibold">{s.date}</p>
-                        <p className="tabular text-xs text-onvariant">
+                        <p className="tabular font-medium text-text-primary">{s.date}</p>
+                        <p className="tabular text-xs text-text-tertiary">
                           {s.setLogs.length} series · {formatWeight(vol, unit)}{" "}
                           volumen
                           {top > 0 && ` · top ${formatWeight(top, unit)}`}
@@ -278,8 +277,8 @@ export default async function RutinaPage({
                       <span
                         className={
                           s.completed
-                            ? "rounded-full bg-tertiary/15 px-3 py-1 text-xs font-bold text-tertiary"
-                            : "rounded-full bg-shigh px-3 py-1 text-xs text-onvariant"
+                            ? "rounded-full bg-[rgba(34,197,94,0.10)] px-3 py-1 text-xs font-medium text-[#22C55E]"
+                            : "rounded-full bg-background-gray-secondary px-3 py-1 text-xs text-text-tertiary"
                         }
                       >
                         {s.completed ? "✓ hecha" : "abierta"}
@@ -291,6 +290,7 @@ export default async function RutinaPage({
             )}
           </section>
         </div>
+      </div>
       </div>
     </main>
   );

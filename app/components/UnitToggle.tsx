@@ -24,27 +24,22 @@ export function UnitToggle({ unit }: { unit: "kg" | "lb" }) {
 
   return (
     <div
-      className="flex items-center rounded-full bg-slowest p-1"
+      className="flex items-center gap-1 rounded-lg bg-tab-background p-1"
       role="group"
       aria-label="Unidad de peso"
     >
       {(["kg", "lb"] as const).map((u) => {
         const isActive = u === optimisticUnit;
-        const accent = u === "kg" ? "text-primary" : "text-secondary";
-        const glow =
-          u === "kg"
-            ? "shadow-[0_0_12px_-2px_rgba(132,204,22,0.3)]"
-            : "shadow-[0_0_12px_-2px_rgba(6,182,212,0.3)]";
         return (
           <button
             key={u}
             type="button"
             disabled={pending || isActive}
             onClick={() => handleSelect(u)}
-            className={`rounded-full px-3 py-1 text-xs font-semibold uppercase transition-all sm:px-4 ${
+            className={`rounded-md px-3 py-1.5 text-xs font-medium uppercase transition-colors sm:px-4 ${
               isActive
-                ? `bg-shigh ${accent} ${glow}`
-                : "text-onvariant hover:text-onsurface"
+                ? "bg-tab-active-background text-text-primary shadow-xs"
+                : "text-text-tertiary hover:text-text-primary"
             }`}
           >
             {u}

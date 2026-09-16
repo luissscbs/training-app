@@ -271,30 +271,30 @@ export function SessionTracker({
   return (
     <section id="registro" className="scroll-mt-24">
       {/* Live header bar */}
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-xl bg-slowest/90 px-4 py-3 shadow-xl">
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border-[0.5px] border-card-border bg-card-background px-4 py-3">
         <div className="flex items-center gap-3">
-          <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-pcont text-onpcont shadow-[0_0_16px_-2px_rgba(132,204,22,0.4)]">
+          <span className="flex size-10 items-center justify-center rounded-xl bg-brand-500/10 text-brand-500">
             <Icon name="timer" className="text-[24px]" />
           </span>
           <div className="flex flex-col">
-            <span className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-primary">
-              <span className="inline-block h-2 w-2 animate-ping rounded-full bg-primary" />
+            <span className="flex items-center gap-1.5 text-[10px] font-medium uppercase tracking-widest text-brand-500">
+              <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-brand-500" />
               {sessionId ? `Sesión #${sessionId} en vivo` : "Sesión sin empezar"}
             </span>
-            <h2 className="text-[22px] font-semibold leading-7 tracking-tight">
+            <h2 className="text-[22px] font-semibold leading-7 tracking-tight text-text-primary">
               {routineTitle}
             </h2>
-            <span className="tabular text-xs text-onvariant">{routineDate}</span>
+            <span className="tabular text-xs text-text-tertiary">{routineDate}</span>
           </div>
         </div>
-        <div className="flex items-center gap-2 rounded-xl bg-slow px-4 py-2">
+        <div className="flex items-center gap-2 rounded-xl bg-background-gray-secondary px-4 py-2">
           <div className="flex flex-col items-center">
-            <span className="text-[10px] uppercase tracking-wider text-onvariant">
+            <span className="text-[10px] uppercase tracking-wider text-text-tertiary">
               Series listas
             </span>
-            <span className="tabular text-lg font-extrabold leading-none text-primary">
+            <span className="tabular text-lg font-semibold leading-none text-text-primary">
               {filledSets}
-              <span className="text-xs font-normal text-onvariant">
+              <span className="text-xs font-normal text-text-tertiary">
                 {" "}
                 / {totalSets}
               </span>
@@ -310,21 +310,21 @@ export function SessionTracker({
           return (
             <div
               key={e.id}
-              className="flex flex-col gap-3 rounded-xl bg-scont p-4 shadow-lg sm:p-5"
+              className="flex flex-col gap-3 rounded-xl border-[0.5px] border-card-border bg-card-background p-4 sm:p-5"
             >
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div className="flex items-center gap-3">
                   <ExerciseThumb name={e.name} />
                   <div className="flex flex-col">
                     <span className="flex flex-wrap items-center gap-2">
-                      <span className="text-[22px] font-semibold leading-7">
+                      <span className="text-[22px] font-semibold leading-7 text-text-primary">
                         {e.name}
                       </span>
-                      <span className="rounded bg-primary/10 px-2 py-0.5 text-[10px] font-bold text-primary">
+                      <span className="rounded bg-brand-500/10 px-2 py-0.5 text-[10px] font-medium text-brand-500">
                         {e.sets} × {e.reps}
                       </span>
                     </span>
-                    <span className="text-xs text-onvariant">
+                    <span className="text-xs text-text-tertiary">
                       {e.muscle ? `${e.muscle} · ` : ""}
                       {lastKg !== undefined
                         ? `Anterior ${toDisplay(lastKg, unit)} ${unit}`
@@ -337,7 +337,7 @@ export function SessionTracker({
                     type="button"
                     aria-label={`Quitar serie a ${e.name}`}
                     onClick={() => changeRows(e.id, -1)}
-                    className="rounded-lg border border-white/10 px-2.5 py-1 text-sm hover:bg-shigh"
+                    className="rounded-lg border border-card-border px-2.5 py-1 text-sm text-text-primary transition-colors hover:bg-background-gray-secondary"
                   >
                     −
                   </button>
@@ -345,7 +345,7 @@ export function SessionTracker({
                     type="button"
                     aria-label={`Añadir serie a ${e.name}`}
                     onClick={() => changeRows(e.id, 1)}
-                    className="rounded-lg border border-white/10 px-2.5 py-1 text-sm hover:bg-shigh"
+                    className="rounded-lg border border-card-border px-2.5 py-1 text-sm text-text-primary transition-colors hover:bg-background-gray-secondary"
                   >
                     +
                   </button>
@@ -353,7 +353,7 @@ export function SessionTracker({
               </div>
 
               {/* Header row (desktop) */}
-              <div className="hidden grid-cols-[2.5rem_1fr_1fr_2.5rem] gap-2 rounded-lg bg-slow/50 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-onvariant sm:grid">
+              <div className="hidden grid-cols-[2.5rem_1fr_1fr_2.5rem] gap-2 rounded-lg bg-background-gray-secondary px-2 py-1 text-[10px] font-medium uppercase tracking-wider text-text-tertiary sm:grid">
                 <span>Serie</span>
                 <span>
                   Carga real ({unit})
@@ -373,24 +373,24 @@ export function SessionTracker({
                     <div
                       key={s}
                       className={`grid grid-cols-[2.5rem_1fr_1fr_2.5rem] items-center gap-2 rounded-lg px-2 py-1 transition-colors ${
-                        done ? "bg-shigh/60" : ""
+                        done ? "bg-background-gray-secondary" : ""
                       }`}
                     >
                       <span
-                        className={`inline-flex h-6 w-6 items-center justify-center rounded text-[10px] font-bold ${
+                        className={`inline-flex h-6 w-6 items-center justify-center rounded text-[10px] font-medium ${
                           done
-                            ? "bg-pcont text-onpcont shadow-[0_0_10px_-2px_rgba(132,204,22,0.5)]"
-                            : "bg-shighest text-onsurface"
+                            ? "bg-button-primary-background text-white"
+                            : "bg-background-gray-tertiary text-text-primary"
                         }`}
                       >
                         {s}
                       </span>
-                      <div className="flex items-center rounded-lg bg-slowest p-1 shadow-inner focus-within:ring-2 focus-within:ring-pcont">
+                      <div className="flex items-center rounded-lg bg-background-gray-secondary p-1 focus-within:ring-2 focus-within:ring-input-primary-focus-border/20">
                         <button
                           type="button"
                           aria-label="Bajar peso"
                           onClick={() => stepCell(e.id, s, "w", -wStep)}
-                          className="flex h-7 w-7 shrink-0 items-center justify-center rounded bg-shigh font-bold hover:text-primary"
+                          className="flex h-7 w-7 shrink-0 items-center justify-center rounded bg-card-background font-medium text-text-secondary shadow-xs hover:text-text-primary"
                         >
                           −
                         </button>
@@ -403,23 +403,23 @@ export function SessionTracker({
                           onChange={(ev) =>
                             setCell(e.id, s, { w: ev.target.value })
                           }
-                          className="tabular w-full bg-transparent text-center text-sm font-bold focus:outline-none"
+                          className="tabular w-full bg-transparent text-center text-sm font-medium text-text-primary placeholder:text-input-placeholder-text focus:outline-none"
                         />
                         <button
                           type="button"
                           aria-label="Subir peso"
                           onClick={() => stepCell(e.id, s, "w", wStep)}
-                          className="flex h-7 w-7 shrink-0 items-center justify-center rounded bg-shigh font-bold hover:text-primary"
+                          className="flex h-7 w-7 shrink-0 items-center justify-center rounded bg-card-background font-medium text-text-secondary shadow-xs hover:text-text-primary"
                         >
                           +
                         </button>
                       </div>
-                      <div className="flex items-center rounded-lg bg-slowest p-1 shadow-inner focus-within:ring-2 focus-within:ring-pcont">
+                      <div className="flex items-center rounded-lg bg-background-gray-secondary p-1 focus-within:ring-2 focus-within:ring-input-primary-focus-border/20">
                         <button
                           type="button"
                           aria-label="Bajar reps"
                           onClick={() => stepCell(e.id, s, "r", -1)}
-                          className="flex h-7 w-7 shrink-0 items-center justify-center rounded bg-shigh font-bold hover:text-primary"
+                          className="flex h-7 w-7 shrink-0 items-center justify-center rounded bg-card-background font-medium text-text-secondary shadow-xs hover:text-text-primary"
                         >
                           −
                         </button>
@@ -432,13 +432,13 @@ export function SessionTracker({
                           onChange={(ev) =>
                             setCell(e.id, s, { r: ev.target.value })
                           }
-                          className="tabular w-full bg-transparent text-center text-sm font-bold focus:outline-none"
+                          className="tabular w-full bg-transparent text-center text-sm font-medium text-text-primary placeholder:text-input-placeholder-text focus:outline-none"
                         />
                         <button
                           type="button"
                           aria-label="Subir reps"
                           onClick={() => stepCell(e.id, s, "r", 1)}
-                          className="flex h-7 w-7 shrink-0 items-center justify-center rounded bg-shigh font-bold hover:text-primary"
+                          className="flex h-7 w-7 shrink-0 items-center justify-center rounded bg-card-background font-medium text-text-secondary shadow-xs hover:text-text-primary"
                         >
                           +
                         </button>
@@ -457,10 +457,10 @@ export function SessionTracker({
                             ? "Serie lista · tocar para enviar"
                             : "Tocar para completar y enviar"
                         }
-                        className={`inline-flex h-8 w-8 cursor-pointer items-center justify-center justify-self-center rounded-lg transition-all hover:ring-2 hover:ring-pcont disabled:opacity-60 ${
+                        className={`inline-flex h-8 w-8 cursor-pointer items-center justify-center justify-self-center rounded-lg transition-colors hover:ring-2 hover:ring-input-primary-focus-border/20 disabled:opacity-60 ${
                           done
-                            ? "bg-primary text-onprimary shadow-[0_0_12px_-2px_rgba(132,204,22,0.4)]"
-                            : "bg-slow text-outlinevar"
+                            ? "bg-button-primary-background text-white"
+                            : "bg-background-gray-secondary text-text-tertiary"
                         }`}
                       >
                         <Icon
@@ -484,9 +484,9 @@ export function SessionTracker({
         })}
       </div>
 
-      <div className="mt-4 flex flex-col gap-3 rounded-xl bg-scont p-4 shadow-lg sm:p-5">
+      <div className="mt-4 flex flex-col gap-3 rounded-xl border-[0.5px] border-card-border bg-card-background p-4 sm:p-5">
         <label className="block">
-          <span className="text-xs font-semibold uppercase tracking-wider text-onvariant">
+          <span className="text-xs font-medium uppercase tracking-wider text-text-tertiary">
             Notas (opcional)
           </span>
           <input
@@ -494,14 +494,14 @@ export function SessionTracker({
             onChange={(ev) => setNotes(ev.target.value)}
             placeholder="Cómo fue, molestias, horario…"
             maxLength={500}
-            className="mt-1 w-full rounded-lg border border-white/10 bg-slowest px-3 py-2 text-sm focus:border-pcont focus:outline-none"
+            className="mt-1 w-full rounded-lg border border-card-border bg-input-background px-3 py-2 text-sm text-text-primary placeholder:text-input-placeholder-text focus:border-input-primary-focus-border focus:outline-none"
           />
         </label>
 
         {msg && (
           <p
             role="status"
-            className="rounded-lg bg-slow p-2.5 text-center text-sm"
+            className="rounded-lg bg-background-gray-secondary p-2.5 text-center text-sm text-text-primary"
           >
             {msg}
           </p>
@@ -511,7 +511,7 @@ export function SessionTracker({
           type="button"
           disabled={pending}
           onClick={() => onSave(false)}
-          className="flex w-full items-center justify-center gap-2 rounded-xl bg-pcont px-5 py-3 text-sm font-extrabold text-onpcont shadow-[0_0_24px_-2px_rgba(132,204,22,0.4)] transition-all hover:scale-[1.01] disabled:opacity-50"
+          className="flex h-12 w-full items-center justify-center gap-2 rounded-lg bg-button-primary-background px-5 text-sm font-medium text-white transition-colors hover:bg-button-primary-hover-background disabled:opacity-50"
         >
           <Icon name="save" className="text-[20px]" />
           {pending
@@ -525,7 +525,7 @@ export function SessionTracker({
             type="button"
             disabled={pending}
             onClick={() => onSave(!completed)}
-            className="flex items-center justify-center gap-2 rounded-xl bg-shigh px-4 py-2.5 text-sm font-semibold transition-all hover:bg-sbright disabled:opacity-50"
+            className="flex h-10 items-center justify-center gap-2 rounded-lg border border-card-border bg-card-background px-4 text-sm font-medium text-text-primary transition-colors hover:bg-background-gray-secondary disabled:opacity-50"
           >
             <Icon name={completed ? "replay" : "flag"} className="text-[18px]" />
             {completed ? "Reabrir" : "Completar"}
@@ -533,8 +533,8 @@ export function SessionTracker({
           <span
             className={`flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm ${
               completed
-                ? "bg-tercont/15 font-bold text-tertiary"
-                : "bg-slow text-onvariant"
+                ? "bg-[rgba(34,197,94,0.10)] font-medium text-[#22C55E]"
+                : "bg-background-gray-secondary text-text-tertiary"
             }`}
           >
             <Icon

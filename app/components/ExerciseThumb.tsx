@@ -16,7 +16,7 @@ export function ExerciseThumb({
   if (!src || failed) {
     return (
       <span
-        className={`flex shrink-0 items-center justify-center rounded-xl bg-shighest text-primary ${className}`}
+        className={`flex shrink-0 items-center justify-center rounded-xl bg-background-gray-secondary text-text-tertiary ${className}`}
         title={name}
       >
         <Icon name="fitness_center" className="text-[22px]" />
@@ -30,7 +30,7 @@ export function ExerciseThumb({
       alt={name}
       loading="lazy"
       onError={() => setFailed(true)}
-      className={`shrink-0 rounded-xl bg-shighest object-cover ${className}`}
+      className={`shrink-0 rounded-xl bg-background-gray-secondary object-cover ${className}`}
     />
   );
 }

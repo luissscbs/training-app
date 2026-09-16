@@ -1,10 +1,12 @@
 import Link from "next/link";
 import { desc, eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
+import { Bolt1, Calendar, CheckCircle1, Muscles } from "@tailgrids/icons";
 import { auth } from "@/auth";
 import { db } from "@/db";
 import { sessions, users } from "@/db/schema";
 import { UnitToggle } from "@/app/components/UnitToggle";
+import { StatCard } from "@/app/components/StatCard";
 import { Icon } from "@/app/components/Icon";
 import { formatWeight } from "@/lib/units";
 import { shiftDateStr } from "@/lib/dates";
@@ -12,7 +14,7 @@ import { getRequestToday } from "@/lib/requestDate";
 
 export default async function ProgresoPage() {
   const session = await auth();
-  if (!session?.user?.id) redirect("/");
+  if (!session?.user?.id) redirect("/login");
 
   const userId = session.user.id;
   const userRows = await db
@@ -68,75 +70,55 @@ export default async function ProgresoPage() {
   }
   const topPrs = [...prs.entries()].sort((a, b) => b[1] - a[1]).slice(0, 8);
 
-  const stats = [
-    {
-      label: "Sesiones",
-      value: String(rows.length),
-      icon: "event_available",
-      accent: "text-secondary",
-    },
-    {
-      label: "Completadas",
-      value: String(completed.length),
-      icon: "verified",
-      accent: "text-tertiary",
-    },
-    {
-      label: "Últimos 7 días",
-      value: String(lastWeek),
-      icon: "pace",
-      accent: "text-primary",
-    },
-    {
-      label: "Volumen total",
-      value: formatWeight(totalVolumeKg, unit),
-      icon: "fitness_center",
-      accent: "text-primary",
-    },
-  ];
-
   return (
-    <main className="relative mx-auto flex w-full max-w-7xl flex-col gap-5 pb-8">
-      <div className="pointer-events-none absolute -top-24 right-1/4 h-96 w-96 rounded-full bg-secondary/10 blur-3xl" />
-
-      <div className="relative z-10 flex items-center justify-between">
-        <div className="flex flex-col">
-          <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl">
+    <main className="mt-6 space-y-5">
+      <div className="flex items-center justify-between px-2 lg:px-6">
+        <div>
+          <h1 className="mb-1 text-[28px] font-medium leading-8 text-text-primary">
             Historial y progreso
           </h1>
-          <p className="text-sm text-onvariant">
+          <p className="text-sm leading-5 text-text-tertiary">
             Volumen, récords y consistencia de tus sesiones
           </p>
         </div>
         <UnitToggle unit={unit} />
       </div>
 
-      <section className="relative z-10 grid grid-cols-2 gap-3 xl:grid-cols-4">
-        {stats.map((s) => (
-          <div
-            key={s.label}
-            className="flex flex-col justify-between rounded-xl bg-slow p-4 shadow-md"
-          >
-            <div className="mb-1 flex items-center justify-between">
-              <span className="text-xs font-semibold uppercase tracking-wider text-onvariant">
-                {s.label}
-              </span>
-              <span className={`rounded-lg bg-shigh p-1.5 ${s.accent}`}>
-                <Icon name={s.icon} className="text-[18px]" />
-              </span>
-            </div>
-            <p className="tabular text-xl font-extrabold">{s.value}</p>
-          </div>
-        ))}
+      <div className="space-y-5 px-2 lg:px-5">
+      <section className="grid grid-cols-2 gap-5 xl:grid-cols-4">
+        <StatCard
+          icon={<Calendar size={18} />}
+          iconClass="bg-[rgba(59,130,246,0.10)] text-[#3B82F6]"
+          value={String(rows.length)}
+          label="Sesiones"
+        />
+        <StatCard
+          icon={<CheckCircle1 size={18} />}
+          iconClass="bg-[rgba(34,197,94,0.10)] text-[#22C55E]"
+          value={String(completed.length)}
+          label="Completadas"
+        />
+        <StatCard
+          icon={<Bolt1 size={18} />}
+          iconClass="bg-[rgba(249,115,22,0.10)] text-[#F97316]"
+          value={String(lastWeek)}
+          label="Últimos 7 días"
+        />
+        <StatCard
+          icon={<Muscles size={18} />}
+          iconClass="bg-[rgba(168,85,247,0.10)] text-[#A855F7]"
+          value={formatWeight(totalVolumeKg, unit)}
+          label="Volumen total"
+        />
       </section>
 
-      <section className="relative z-10 rounded-xl bg-slow p-5 shadow-md sm:p-6">
-        <h2 className="text-lg font-semibold">Volumen por sesión</h2>
+      <section className="rounded-xl border-[0.5px] border-card-border bg-card-background p-5">
+        <h2 className="font-semibold leading-6 tracking-[-0.2px] text-text-primary">Volumen por sesión</h2>
         {rows.length === 0 ? (
-          <p className="mt-2 text-sm text-onvariant">
+          <p className="mt-2 text-sm text-text-tertiary">
             Aún no hay sesiones. Registra la de hoy desde{" "}
-            <Link href="/#registro" className="text-primary underline underline-offset-4">
-              Registro
+            <Link href="/semana" className="font-medium text-brand-500 underline underline-offset-4">
+              Semana
             </Link>
             .
           </p>
@@ -148,7 +130,7 @@ export default async function ProgresoPage() {
                   key={r.id}
                   title={`${r.date} · ${formatWeight(r.volumeKg, unit)}`}
                   className={`flex-1 rounded-t-md ${
-                    r.completed ? "bg-pcont" : "bg-shighest"
+                    r.completed ? "bg-brand-500" : "bg-background-gray-tertiary"
                   }`}
                   style={{
                     height: `${Math.max(6, Math.round((r.volumeKg / maxVolume) * 100))}%`,
@@ -157,7 +139,7 @@ export default async function ProgresoPage() {
               ))}
             </div>
             {best && best.volumeKg > 0 && (
-              <p className="mt-2 text-xs text-onvariant">
+              <p className="mt-2 text-xs text-text-tertiary">
                 Mejor sesión: {formatWeight(best.volumeKg, unit)}
               </p>
             )}
@@ -166,16 +148,18 @@ export default async function ProgresoPage() {
       </section>
 
       {topPrs.length > 0 && (
-        <section className="relative z-10 rounded-xl bg-slow p-5 shadow-md sm:p-6">
-          <h2 className="flex items-center gap-2 text-lg font-semibold">
-            <Icon name="military_tech" className="text-[20px] text-primary" />
+        <section className="rounded-xl border-[0.5px] border-card-border bg-card-background p-5">
+          <h2 className="flex items-center gap-2 font-semibold leading-6 tracking-[-0.2px] text-text-primary">
+            <span className="flex size-8 items-center justify-center rounded-lg bg-[rgba(168,85,247,0.10)] text-[#A855F7]">
+              <Icon name="military_tech" className="text-[18px]" />
+            </span>
             Récords por ejercicio
           </h2>
-          <ul className="mt-3 divide-y divide-shigh text-sm">
+          <ul className="mt-3 divide-y divide-card-border text-sm">
             {topPrs.map(([name, kg]) => (
               <li key={name} className="flex justify-between py-2">
-                <span>{name}</span>
-                <span className="tabular font-bold text-primary">
+                <span className="text-text-primary">{name}</span>
+                <span className="tabular font-medium text-text-primary">
                   {formatWeight(kg, unit)}
                 </span>
               </li>
@@ -184,27 +168,27 @@ export default async function ProgresoPage() {
         </section>
       )}
 
-      <section className="relative z-10 rounded-xl bg-slow p-5 shadow-md sm:p-6">
-        <h2 className="text-lg font-semibold">Historial</h2>
+      <section className="rounded-xl border-[0.5px] border-card-border bg-card-background p-5">
+        <h2 className="font-semibold leading-6 tracking-[-0.2px] text-text-primary">Historial</h2>
         <ul className="mt-3 flex flex-col gap-2">
           {rows.map((r) => (
             <li
               key={r.id}
-              className="flex items-center justify-between rounded-xl border border-white/10 p-3 text-sm"
+              className="flex items-center justify-between rounded-xl border border-card-border p-3 text-sm"
             >
               <div>
-                <p className="font-semibold">
+                <p className="font-medium text-text-primary">
                   {r.date} — {r.title}
                 </p>
-                <p className="tabular text-xs text-onvariant">
+                <p className="tabular text-xs text-text-tertiary">
                   {r.sets} series · {formatWeight(r.volumeKg, unit)} volumen
                 </p>
               </div>
               <span
                 className={
                   r.completed
-                    ? "rounded-full bg-tertiary/15 px-3 py-1 text-xs font-bold text-tertiary"
-                    : "rounded-full bg-shigh px-3 py-1 text-xs text-onvariant"
+                    ? "rounded-full bg-[rgba(34,197,94,0.10)] px-3 py-1 text-xs font-medium text-[#22C55E]"
+                    : "rounded-full bg-background-gray-secondary px-3 py-1 text-xs text-text-tertiary"
                 }
               >
                 {r.completed ? "✓ hecha" : "abierta"}
@@ -213,6 +197,7 @@ export default async function ProgresoPage() {
           ))}
         </ul>
       </section>
+      </div>
     </main>
   );
 }

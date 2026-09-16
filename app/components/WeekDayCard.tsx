@@ -55,14 +55,12 @@ export function WeekDayCard({ day }: { day: DayCardData }) {
 
   return (
     <div
-      className={`relative flex flex-col overflow-hidden rounded-xl shadow-md transition-all ${
-        day.isToday
-          ? "bg-scont shadow-[0_0_20px_-4px_rgba(158,233,57,0.25)]"
-          : "bg-slow"
+      className={`relative flex flex-col overflow-hidden rounded-xl border-[0.5px] bg-card-background transition-colors ${
+        day.isToday ? "border-brand-500/50" : "border-card-border"
       }`}
     >
       {day.isToday && (
-        <span className="absolute inset-x-0 top-0 h-1 bg-primary" />
+        <span className="absolute inset-x-0 top-0 h-1 bg-brand-500" />
       )}
       <button
         type="button"
@@ -72,48 +70,50 @@ export function WeekDayCard({ day }: { day: DayCardData }) {
       >
         <span
           className={`flex h-12 w-12 shrink-0 flex-col items-center justify-center rounded-xl ${
-            day.isToday ? "bg-primary/10 text-primary" : "bg-shigh text-onvariant"
+            day.isToday
+              ? "bg-brand-500/10 text-brand-500"
+              : "bg-background-gray-secondary text-text-tertiary"
           }`}
         >
-          <span className="text-[10px] font-bold uppercase tracking-wider">
+          <span className="text-[10px] font-medium uppercase tracking-wider">
             {day.dayAbbr}
           </span>
-          <span className="tabular text-lg font-extrabold leading-none">
+          <span className="tabular text-lg font-semibold leading-none">
             {day.dayNum}
           </span>
         </span>
           <span className="flex min-w-0 flex-1 flex-col">
             <span className="flex flex-wrap items-center gap-1.5">
-              <span className="truncate text-sm font-bold">{day.title}</span>
+              <span className="truncate text-sm font-medium">{day.title}</span>
               {day.custom && (
-                <span className="rounded-full bg-seccont/20 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-secondary">
+                <span className="rounded-full bg-[rgba(14,165,233,0.10)] px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-[#0EA5E9]">
                   Mía
                 </span>
               )}
             {day.isToday && (
-              <span className="rounded-full bg-primary/20 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-primary">
+              <span className="rounded-full bg-brand-500/10 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-brand-500">
                 Hoy
               </span>
             )}
             {day.completed && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-tertiary/10 px-2 py-0.5 text-[10px] font-bold uppercase text-tertiary">
+              <span className="inline-flex items-center gap-1 rounded-full bg-[rgba(34,197,94,0.10)] px-2 py-0.5 text-[10px] font-medium uppercase text-[#22C55E]">
                 <Icon name="check_circle" className="text-[13px]" />
                 Hecha
               </span>
             )}
           </span>
-          <span className="tabular truncate text-xs text-onvariant">{metric}</span>
+          <span className="tabular truncate text-xs text-text-tertiary">{metric}</span>
         </span>
         <Icon
           name="expand_more"
-          className={`shrink-0 text-[24px] text-onvariant transition-transform ${open ? "rotate-180" : ""}`}
+          className={`shrink-0 text-[24px] text-text-tertiary transition-transform ${open ? "rotate-180" : ""}`}
         />
       </button>
 
       {open && (
-        <div className="flex flex-col gap-2 border-t border-white/5 p-3 sm:p-4">
+        <div className="flex flex-col gap-2 border-t border-card-border p-3 sm:p-4">
           {day.focus && (
-            <p className="text-xs text-onvariant">{day.focus}</p>
+            <p className="text-xs text-text-tertiary">{day.focus}</p>
           )}
           <ul className="flex flex-col gap-1.5">
             {day.exercises.map((e) => {
@@ -124,26 +124,26 @@ export function WeekDayCard({ day }: { day: DayCardData }) {
               return (
                 <li
                   key={e.id}
-                  className="flex items-center gap-2.5 rounded-lg bg-shigh/60 p-2"
+                  className="flex items-center gap-2.5 rounded-lg bg-background-gray-secondary p-2"
                 >
                   <ExerciseThumb name={e.name} className="h-11 w-11" />
                   <span className="flex min-w-0 flex-1 flex-col">
-                    <span className="truncate text-xs font-bold leading-snug">
+                    <span className="truncate text-xs font-medium leading-snug text-text-primary">
                       {e.name}
                     </span>
-                    <span className="tabular text-[11px] text-onvariant">
+                    <span className="tabular text-[11px] text-text-tertiary">
                       Prog. {e.sets} × {e.reps}
                       {e.muscle ? ` · ${e.muscle}` : ""}
                     </span>
                   </span>
                   <span className="flex shrink-0 flex-col items-end">
                     <span
-                      className={`tabular inline-flex items-center gap-1 text-xs font-bold ${
+                      className={`tabular inline-flex items-center gap-1 text-xs font-medium ${
                         done
-                          ? "text-primary"
+                          ? "text-[#22C55E]"
                           : partial
-                            ? "text-secondary"
-                            : "text-onvariant"
+                            ? "text-[#0EA5E9]"
+                            : "text-text-tertiary"
                       }`}
                     >
                       <Icon
@@ -158,7 +158,7 @@ export function WeekDayCard({ day }: { day: DayCardData }) {
                       />
                       {count}/{e.sets}
                     </span>
-                    <span className="tabular text-[11px] text-onvariant">
+                    <span className="tabular text-[11px] text-text-tertiary">
                       {log && log.topKg > 0
                         ? `top ${formatWeight(log.topKg, unit)}`
                         : e.lastKg !== null
@@ -174,7 +174,7 @@ export function WeekDayCard({ day }: { day: DayCardData }) {
             {day.loggable && !day.completed && (
               <Link
                 href={day.registerHref}
-                className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-pcont px-3 py-2 text-xs font-extrabold text-onpcont transition-all hover:scale-[1.01]"
+                className="flex h-10 flex-1 items-center justify-center gap-1.5 rounded-lg bg-button-primary-background px-3 text-xs font-medium text-white transition-colors hover:bg-button-primary-hover-background"
               >
                 <Icon name="edit" className="text-[16px]" />
                 {day.isToday ? "Registrar hoy" : "Registrar ese día"}
@@ -182,7 +182,7 @@ export function WeekDayCard({ day }: { day: DayCardData }) {
             )}
             <Link
               href={day.detailHref}
-              className={`flex items-center justify-center gap-1.5 rounded-lg bg-shigh px-3 py-2 text-xs font-bold hover:bg-sbright ${day.loggable && !day.completed ? "flex-1" : "flex-[2]"}`}
+              className={`flex h-10 items-center justify-center gap-1.5 rounded-lg border border-card-border bg-card-background px-3 text-xs font-medium text-text-primary transition-colors hover:bg-background-gray-secondary ${day.loggable && !day.completed ? "flex-1" : "flex-[2]"}`}
             >
               <Icon name="visibility" className="text-[16px]" />
               Ver completo

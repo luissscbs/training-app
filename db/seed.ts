@@ -25,7 +25,7 @@ type SeedExercise = {
 const WEEK: { weekday: number; title: string; focus: string; exercises: SeedExercise[] }[] = [
   {
     weekday: 0,
-    title: "Lunes — Pecho + Tríceps",
+    title: "Pecho + Tríceps",
     focus: "Empuje tren superior",
     exercises: [
       { name: "Press banca con barra", sets: 4, reps: "6-8", muscle: "pecho" },
@@ -37,7 +37,7 @@ const WEEK: { weekday: number; title: string; focus: string; exercises: SeedExer
   },
   {
     weekday: 1,
-    title: "Martes — Espalda + Bíceps",
+    title: "Espalda + Bíceps",
     focus: "Tirón tren superior",
     exercises: [
       { name: "Dominadas (o jalón al pecho)", sets: 4, reps: "6-8", muscle: "espalda" },
@@ -49,7 +49,7 @@ const WEEK: { weekday: number; title: string; focus: string; exercises: SeedExer
   },
   {
     weekday: 2,
-    title: "Miércoles — Pierna (cuádriceps)",
+    title: "Pierna (cuádriceps)",
     focus: "Tren inferior",
     exercises: [
       { name: "Sentadilla con barra", sets: 4, reps: "5-6", muscle: "cuádriceps" },
@@ -61,7 +61,7 @@ const WEEK: { weekday: number; title: string; focus: string; exercises: SeedExer
   },
   {
     weekday: 3,
-    title: "Jueves — Hombro + Core",
+    title: "Hombro + Core",
     focus: "Empuje vertical y zona media",
     exercises: [
       { name: "Press militar con barra", sets: 4, reps: "6-8", muscle: "hombro" },
@@ -73,7 +73,7 @@ const WEEK: { weekday: number; title: string; focus: string; exercises: SeedExer
   },
   {
     weekday: 4,
-    title: "Viernes — Full-body fuerza",
+    title: "Full-body fuerza",
     focus: "Básicos pesados",
     exercises: [
       { name: "Peso muerto", sets: 4, reps: "5-6", muscle: "cadena posterior" },
@@ -84,7 +84,7 @@ const WEEK: { weekday: number; title: string; focus: string; exercises: SeedExer
   },
   {
     weekday: 5,
-    title: "Sábado — Posterior + Glúteo",
+    title: "Posterior + Glúteo",
     focus: "Tren inferior",
     exercises: [
       { name: "Hip thrust", sets: 4, reps: "8-10", muscle: "glúteo" },
@@ -96,7 +96,7 @@ const WEEK: { weekday: number; title: string; focus: string; exercises: SeedExer
   },
   {
     weekday: 6,
-    title: "Domingo — Movilidad + Core suave",
+    title: "Movilidad + Core suave",
     focus: "Recuperación activa",
     exercises: [
       { name: "Movilidad de cadera 10'", sets: 1, reps: "10 min", muscle: "movilidad" },

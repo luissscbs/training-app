@@ -24,7 +24,7 @@ export default async function RutinaCustomPage({
   if (!Number.isInteger(routineId)) notFound();
 
   const session = await auth();
-  if (!session?.user?.id) redirect("/");
+  if (!session?.user?.id) redirect("/login");
   const userId = session.user.id;
 
   const routine = await db.query.routines.findFirst({
@@ -88,28 +88,27 @@ export default async function RutinaCustomPage({
   }
 
   return (
-    <main className="relative mx-auto flex w-full max-w-7xl flex-col gap-5 pb-8">
-      <div className="pointer-events-none absolute -top-24 right-1/4 h-96 w-96 rounded-full bg-secondary/10 blur-3xl" />
-
-      <div className="relative z-10">
+    <main className="mt-6 space-y-5">
+      <div className="px-2 lg:px-6">
         <Link
           href="/rutinas"
-          className="flex w-fit items-center gap-1 text-sm text-onvariant hover:text-primary"
+          className="flex w-fit items-center gap-1 text-sm font-medium text-text-tertiary transition-colors hover:text-text-primary"
         >
           <Icon name="chevron_left" className="text-[18px]" />
           Mis rutinas
         </Link>
-        <h1 className="mt-2 text-3xl font-extrabold tracking-tight sm:text-4xl">
+        <h1 className="mb-1 mt-2 text-[28px] font-medium leading-8 text-text-primary">
           {routine.title}
         </h1>
         {routine.focus && (
-          <p className="mt-1 text-sm text-onvariant">{routine.focus}</p>
+          <p className="text-sm leading-5 text-text-tertiary">{routine.focus}</p>
         )}
       </div>
 
-      <div className="relative z-10 flex flex-wrap items-center gap-2 rounded-xl bg-slow p-4 shadow-md">
-        <span className="flex items-center gap-1.5 text-sm font-semibold">
-          <Icon name="calendar_month" className="text-[20px] text-secondary" />
+      <div className="space-y-5 px-2 lg:px-5">
+      <div className="flex flex-wrap items-center gap-2 rounded-xl border-[0.5px] border-card-border bg-card-background p-4">
+        <span className="flex items-center gap-1.5 text-sm font-medium text-text-primary">
+          <Icon name="calendar_month" className="text-[20px] text-brand-500" />
           Sesión del
         </span>
         <form method="get" action={`/rutinas/${routine.id}`} className="flex items-center gap-1.5">
@@ -118,21 +117,21 @@ export default async function RutinaCustomPage({
             name="date"
             defaultValue={date}
             max={today}
-            className="rounded-lg border border-white/10 bg-slowest px-2 py-1.5 text-xs text-onsurface [color-scheme:dark]"
+            className="rounded-lg border border-card-border bg-input-background px-2 py-1.5 text-xs text-text-primary [color-scheme:light_dark] focus:border-input-primary-focus-border focus:outline-none"
           />
           <button
             type="submit"
-            className="rounded-lg bg-shigh px-3 py-1.5 text-xs font-bold hover:bg-sbright"
+            className="rounded-lg bg-background-gray-secondary px-3 py-1.5 text-xs font-medium text-text-primary transition-colors hover:bg-background-gray-tertiary"
           >
             Ir
           </button>
         </form>
-        <span className="tabular text-xs text-onvariant">
+        <span className="tabular text-xs text-text-tertiary">
           {date === today ? "Hoy" : date} · puedes registrar días pasados
         </span>
       </div>
 
-      <div className="relative z-10 grid grid-cols-1 items-start gap-5 lg:grid-cols-12">
+      <div className="grid grid-cols-1 items-start gap-5 lg:grid-cols-12">
         <div className="lg:col-span-8">
           <SessionTracker
             key={`${routine.id}-${date}-${unit}`}
@@ -155,15 +154,15 @@ export default async function RutinaCustomPage({
           />
         </div>
         <div className="lg:col-span-4">
-          <section className="rounded-xl bg-scont p-5 shadow-lg">
-            <h2 className="text-lg font-semibold">Ejercicios</h2>
+          <section className="rounded-xl border-[0.5px] border-card-border bg-card-background p-5">
+            <h2 className="font-semibold leading-6 tracking-[-0.2px] text-text-primary">Ejercicios</h2>
             <ul className="mt-3 flex flex-col gap-2.5">
               {routine.exercises.map((e) => (
                 <li key={e.id} className="flex items-center gap-3">
                   <ExerciseThumb name={e.name} className="h-14 w-14" />
                   <span className="flex min-w-0 flex-1 flex-col">
-                    <span className="truncate text-sm font-semibold">{e.name}</span>
-                    <span className="tabular text-xs text-onvariant">
+                    <span className="truncate text-sm font-medium text-text-primary">{e.name}</span>
+                    <span className="tabular text-xs text-text-tertiary">
                       {e.sets} × {e.reps}
                       {e.muscle ? ` · ${e.muscle}` : ""}
                       {lastByExercise[e.id] !== undefined &&
@@ -173,9 +172,10 @@ export default async function RutinaCustomPage({
                 </li>
               ))}
             </ul>
-            <p className="mt-4 text-[10px] text-onvariant">{IMAGE_CREDIT}</p>
+            <p className="mt-4 text-[10px] text-text-tertiary">{IMAGE_CREDIT}</p>
           </section>
         </div>
+      </div>
       </div>
     </main>
   );

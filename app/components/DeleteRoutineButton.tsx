@@ -24,7 +24,7 @@ export function DeleteRoutineButton({ id, title }: { id: number; title: string }
         });
       }}
       aria-label={`Borrar ${title}`}
-      className="rounded-lg p-2 text-onvariant hover:bg-shigh hover:text-error disabled:opacity-50"
+      className="rounded-lg p-2 text-text-tertiary transition-colors hover:bg-background-gray-secondary hover:text-red-600 disabled:opacity-50"
     >
       <Icon name="delete" className="text-[20px]" />
     </button>
